@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="46%" r="58%">
+      <stop offset="0" stop-color="#45544a"/>
+      <stop offset="1" stop-color="#32363e"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- Maskable safe area: central ~66% — keep mark inside y?86–426, x?86–426 -->
+  <text x="256" y="276" text-anchor="middle" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="160" font-weight="700" fill="#c9ab6e">£</text>
+</svg>

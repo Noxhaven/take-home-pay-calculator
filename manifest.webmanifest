@@ -1,0 +1,25 @@
+{
+  "name": "UK Take-Home Pay Calculator",
+  "short_name": "Take-Home",
+  "description": "2026/27 UK take-home pay estimate",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#32363e",
+  "theme_color": "#32363e",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

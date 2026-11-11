@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#32363e" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" id="meta-theme" content="#32363e">
+<script>try{var t=localStorage.getItem('take-home-theme');document.documentElement.setAttribute('data-theme',t==='light'||t==='dark'?t:'system')}catch(e){document.documentElement.setAttribute('data-theme','system')}</script>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Take-Home">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<title>UK Take-Home Pay Calculator</title>
+<style>
+:root{
+  --sat:env(safe-area-inset-top,0px);
+  --sar:env(safe-area-inset-right,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);
+  --fold-top:env(fold-top,0px);
+  --fold-bottom:env(fold-bottom,0px);
+  --fold-left:env(fold-left,0px);
+  --fold-right:env(fold-right,0px);
+  --fold-w:env(fold-width,0px);
+  --fold-h:env(fold-height,0px);
+  --page-pad:max(16px,12px);
+  --content-w:min(100%,780px);
+  color-scheme:dark;
+  --bg-body:#32363e;
+  --scene-bg:
+    radial-gradient(ellipse 78% 62% at 50% 42%, rgba(120,112,100,.14) 0%, transparent 62%),
+    radial-gradient(1000px 680px at 14% -6%, rgba(90,84,78,.22) 0%, transparent 56%),
+    radial-gradient(880px 600px at 88% 10%, rgba(85,82,76,.18) 0%, transparent 54%),
+    radial-gradient(760px 620px at 56% 108%, rgba(78,76,72,.16) 0%, transparent 58%),
+    radial-gradient(ellipse 115% 95% at 50% 50%, transparent 32%, rgba(20,18,16,.55) 78%, rgba(14,13,12,.75) 100%),
+    linear-gradient(180deg,#3a3e46 0%,#32363e 48%,#2e3238 100%);
+  --blob-a:#6a6660;--blob-b:#5e5c58;--blob-c:#585650;
+  --blob-opacity:.32;--blob-blend:screen;--grain-opacity:.09;
+  --card-bg:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03) 45%,rgba(255,255,255,.02)),#454950;
+  --card-shine:rgba(255,255,255,.18);--card-rim:rgba(255,255,255,.75);
+  --glass-fallback:#454950;
+  --stroke:rgba(255,255,255,.22);
+  --card-shadow:0 1px 0 rgba(255,255,255,.38) inset,0 -14px 32px rgba(0,0,0,.12) inset,0 14px 36px rgba(0,0,0,.22);
+  --ink:#f2f0ec;--muted:rgba(242,240,236,.62);--label:rgba(242,240,236,.76);
+  --hero-top:#f4f1ea;--hero-bot:#c9ab6e;--hero-glow:rgba(201,171,110,.22);
+  --red:#e89088;--warn-text:#e8b4a8;--link:#a8c0e0;
+  --input-bg:rgba(0,0,0,.16);--input-border:rgba(255,255,255,.16);
+  --input-inset:0 1px 0 rgba(255,255,255,.12) inset,0 4px 12px rgba(0,0,0,.12) inset;
+  --focus-border:rgba(255,255,255,.5);--focus-ring:rgba(201,171,110,.22);
+  --seg-bg:rgba(0,0,0,.14);--seg-border:rgba(255,255,255,.1);
+  --seg-btn:rgba(255,255,255,.78);
+  --seg-on-bg:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.06));
+  --seg-on-border:rgba(255,255,255,.26);--seg-on-ink:#fff;--seg-on-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 14px rgba(0,0,0,.15);
+  --table-line:rgba(255,255,255,.09);--tot-line:rgba(255,255,255,.22);
+  --chip-bg:rgba(0,0,0,.18);--chip-border:rgba(255,255,255,.22);--chip-inset:0 1px 0 rgba(255,255,255,.14) inset;
+  --tip-bg:rgba(0,0,0,.18);--tip-border:rgba(255,255,255,.1);--note:rgba(242,240,236,.55);
+  --select-chevron:#f2f0ec;
+}
+@media (prefers-color-scheme:light){
+  :root[data-theme="system"]{
+    --bg-body:#f6f3ec;
+    --scene-bg:
+      radial-gradient(ellipse 82% 68% at 50% 38%, rgba(205,220,198,.55) 0%, transparent 62%),
+      radial-gradient(960px 640px at 12% -4%, rgba(230,218,195,.4) 0%, transparent 56%),
+      radial-gradient(820px 560px at 90% 8%, rgba(198,212,192,.35) 0%, transparent 54%),
+      radial-gradient(720px 580px at 50% 100%, rgba(186,202,178,.28) 0%, transparent 58%),
+      radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(220,210,195,.35) 100%),
+      linear-gradient(180deg,#faf7f1 0%,#f6f3ec 50%,#efebe3 100%);
+    --blob-a:#c5d4c0;--blob-b:#ddd0b8;--blob-c:#b8c9b4;
+    --blob-opacity:.38;--blob-blend:multiply;--grain-opacity:.07;
+    --card-bg:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.2) 42%,rgba(248,252,247,.9)),#dfe8df;
+    --card-shine:rgba(255,255,255,.85);--card-rim:rgba(255,255,255,.95);
+    --glass-fallback:#dfe8df;
+    --stroke:rgba(72,88,72,.22);
+    --card-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 -10px 24px rgba(120,140,110,.08) inset,0 10px 28px rgba(80,70,50,.08);
+    --ink:#2c2e30;--muted:rgba(44,46,48,.62);--label:rgba(44,46,48,.78);
+    --hero-top:#4a4438;--hero-bot:#b8954a;--hero-glow:rgba(184,149,74,.2);
+    --red:#c45c54;--warn-text:#b85a50;--link:#3d6a9e;
+    --input-bg:rgba(255,255,255,.72);--input-border:rgba(72,88,72,.18);
+    --input-inset:0 1px 0 rgba(255,255,255,.95) inset,0 2px 8px rgba(80,70,50,.06) inset;
+    --focus-border:rgba(184,149,74,.55);--focus-ring:rgba(184,149,74,.2);
+    --seg-bg:rgba(255,255,255,.45);--seg-border:rgba(72,88,72,.14);
+    --seg-btn:rgba(44,46,48,.72);
+    --seg-on-bg:linear-gradient(180deg,rgba(210,180,110,.38),rgba(196,163,90,.18));
+    --seg-on-border:rgba(184,149,74,.48);--seg-on-ink:#3d3428;
+    --seg-on-shadow:0 1px 0 rgba(255,255,255,.65) inset,0 3px 10px rgba(184,149,74,.15);
+    --table-line:rgba(44,46,48,.1);--tot-line:rgba(44,46,48,.2);
+    --chip-bg:rgba(255,255,255,.55);--chip-border:rgba(72,88,72,.18);--chip-inset:0 1px 0 rgba(255,255,255,.85) inset;
+    --tip-bg:rgba(255,255,255,.5);--tip-border:rgba(72,88,72,.12);--note:rgba(44,46,48,.55);
+    --select-chevron:#2c2e30;
+  }
+}
+:root[data-theme="light"]{
+  --bg-body:#f6f3ec;
+  --scene-bg:
+    radial-gradient(ellipse 82% 68% at 50% 38%, rgba(205,220,198,.55) 0%, transparent 62%),
+    radial-gradient(960px 640px at 12% -4%, rgba(230,218,195,.4) 0%, transparent 56%),
+    radial-gradient(820px 560px at 90% 8%, rgba(198,212,192,.35) 0%, transparent 54%),
+    radial-gradient(720px 580px at 50% 100%, rgba(186,202,178,.28) 0%, transparent 58%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(220,210,195,.35) 100%),
+    linear-gradient(180deg,#faf7f1 0%,#f6f3ec 50%,#efebe3 100%);
+  --blob-a:#c5d4c0;--blob-b:#ddd0b8;--blob-c:#b8c9b4;
+  --blob-opacity:.38;--blob-blend:multiply;--grain-opacity:.07;
+  --card-bg:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.2) 42%,rgba(248,252,247,.9)),#dfe8df;
+  --card-shine:rgba(255,255,255,.85);--card-rim:rgba(255,255,255,.95);
+  --glass-fallback:#dfe8df;
+  --stroke:rgba(72,88,72,.22);
+  --card-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 -10px 24px rgba(120,140,110,.08) inset,0 10px 28px rgba(80,70,50,.08);
+  --ink:#2c2e30;--muted:rgba(44,46,48,.62);--label:rgba(44,46,48,.78);
+  --hero-top:#4a4438;--hero-bot:#b8954a;--hero-glow:rgba(184,149,74,.2);
+  --red:#c45c54;--warn-text:#b85a50;--link:#3d6a9e;
+  --input-bg:rgba(255,255,255,.72);--input-border:rgba(72,88,72,.18);
+  --input-inset:0 1px 0 rgba(255,255,255,.95) inset,0 2px 8px rgba(80,70,50,.06) inset;
+  --focus-border:rgba(184,149,74,.55);--focus-ring:rgba(184,149,74,.2);
+  --seg-bg:rgba(255,255,255,.45);--seg-border:rgba(72,88,72,.14);
+  --seg-btn:rgba(44,46,48,.72);
+  --seg-on-bg:linear-gradient(180deg,rgba(210,180,110,.38),rgba(196,163,90,.18));
+  --seg-on-border:rgba(184,149,74,.48);--seg-on-ink:#3d3428;
+  --seg-on-shadow:0 1px 0 rgba(255,255,255,.65) inset,0 3px 10px rgba(184,149,74,.15);
+  --table-line:rgba(44,46,48,.1);--tot-line:rgba(44,46,48,.2);
+  --chip-bg:rgba(255,255,255,.55);--chip-border:rgba(72,88,72,.18);--chip-inset:0 1px 0 rgba(255,255,255,.85) inset;
+  --tip-bg:rgba(255,255,255,.5);--tip-border:rgba(72,88,72,.12);--note:rgba(44,46,48,.55);
+  --select-chevron:#2c2e30;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{color-scheme:dark}
+@media (prefers-color-scheme:light){:root[data-theme="system"]{color-scheme:light}}
+@media (prefers-color-scheme:dark){:root[data-theme="system"]{color-scheme:dark}}
+*{box-sizing:border-box}
+html{
+  margin:0;
+  height:100%;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  overflow-x:hidden;
+}
+body{
+  margin:0;
+  min-height:100%;
+  min-height:100dvh;
+  min-height:-webkit-fill-available;
+  font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;
+  color:var(--ink);
+  background:var(--bg-body);
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  overscroll-behavior-y:none;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.scene{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--scene-bg)}
+.blob{
+  position:absolute;filter:blur(48px);opacity:var(--blob-opacity);border-radius:50%;
+  mix-blend-mode:var(--blob-blend);animation:drift 22s ease-in-out infinite;
+}
+@media (prefers-reduced-motion:reduce){
+  .blob{animation:none}
+}
+.blob.a{width:42vw;height:42vw;left:-8%;top:-12%;background:var(--blob-a);animation-duration:26s}
+.blob.b{width:36vw;height:36vw;right:-10%;top:8%;background:var(--blob-b);animation-duration:31s;animation-delay:-8s}
+.blob.c{width:48vw;height:48vw;left:22%;bottom:-28%;background:var(--blob-c);animation-duration:28s;animation-delay:-14s}
+@keyframes drift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(4%,6%) scale(1.08)}
+  66%{transform:translate(-5%,-3%) scale(.94)}
+}
+.grain{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--grain-opacity);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.42'/></svg>");
+  background-size:180px 180px;
+}
+.wrap{
+  position:relative;z-index:2;
+  width:var(--content-w);
+  max-width:100%;
+  margin-inline:auto;
+  padding:
+    max(12px,var(--sat),var(--fold-top))
+    max(var(--page-pad),var(--sar),var(--fold-right))
+    max(28px,var(--sab),var(--fold-bottom))
+    max(var(--page-pad),var(--sal),var(--fold-left));
+}
+.hdr{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 12px;margin-bottom:2px}
+.hdr-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;justify-content:flex-end}
+.hdr-text{flex:1 1 12rem;min-width:0}
+h1{font-size:clamp(1.15rem,4.2vw + .4rem,1.55rem);letter-spacing:-.03em;margin:6px 0 4px;font-weight:700;line-height:1.2}
+p.sub{margin:0 0 14px;color:var(--muted);font-size:clamp(.82rem,2.5vw,.92rem);line-height:1.35}
+.install,.theme-toggle{
+  flex:0 0 auto;align-self:flex-start;
+  font:inherit;font-size:.78rem;font-weight:600;
+  color:var(--ink);cursor:pointer;
+  padding:10px 14px;min-height:44px;
+  border-radius:14px;border:1px solid var(--chip-border);
+  background:var(--chip-bg);
+  box-shadow:var(--chip-inset);
+}
+.install[hidden]{display:none!important}
+.install-tip{
+  font-size:.76rem;color:var(--note);line-height:1.4;
+  margin:-6px 0 14px;padding:10px 12px;border-radius:12px;
+  border:1px solid var(--tip-border);background:var(--tip-bg);
+}
+.install-tip[hidden]{display:none}
+.code-warn{font-size:.76rem;color:var(--warn-text);margin-top:6px;line-height:1.4;display:none}
+.code-warn.show{display:block}
+.code-warn a{color:var(--link)}
+.glass{
+  position:relative;
+  background:var(--card-bg);
+  border:1px solid var(--stroke);
+  border-radius:28px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:var(--card-shadow);
+  backdrop-filter:blur(34px) saturate(160%);
+  -webkit-backdrop-filter:blur(34px) saturate(160%);
+  overflow:hidden;
+}
+.glass::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(120% 90px at 50% -10%,var(--card-shine),transparent 70%);
+}
+.glass::after{
+  content:"";position:absolute;left:8%;right:8%;top:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--card-rim),transparent);
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(10px,2.5vw,14px);
+  margin-top:12px;
+}
+@media (min-width:520px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (spanning:none) and (min-width:520px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (spanning:none) and (min-width:900px){
+  :root{--content-w:min(100%,840px)}
+}
+label{display:block;font-size:.78rem;font-weight:650;color:var(--label);margin-bottom:6px;letter-spacing:.01em}
+.field{min-width:0}
+input,select{
+  display:block;width:100%;max-width:100%;
+  padding:12px;border-radius:14px;font-size:16px;color:var(--ink);
+  background:var(--input-bg);
+  border:1px solid var(--input-border);
+  box-shadow:var(--input-inset);
+  outline:none;appearance:none;-webkit-appearance:none;min-height:48px;
+}
+select{
+  background-image:linear-gradient(45deg,transparent 50%,var(--select-chevron) 50%),linear-gradient(135deg,var(--select-chevron) 50%,transparent 50%);
+  background-position:calc(100% - 16px) 54%,calc(100% - 11px) 54%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+input:focus,select:focus{
+  border-color:var(--focus-border);
+  box-shadow:0 0 0 4px var(--focus-ring),var(--input-inset);
+}
+.seg{display:flex;gap:6px;padding:5px;border-radius:16px;background:var(--seg-bg);border:1px solid var(--seg-border)}
+.seg button{
+  flex:1;padding:10px 8px;border:0;border-radius:12px;background:transparent;
+  font-size:.95rem;color:var(--seg-btn);cursor:pointer;min-height:44px;
+}
+.seg button.on{
+  color:var(--seg-on-ink);font-weight:650;
+  background:var(--seg-on-bg);
+  border:1px solid var(--seg-on-border);
+  box-shadow:var(--seg-on-shadow);
+  backdrop-filter:blur(12px);
+}
+.big{text-align:center;padding:6px 0 8px;position:relative;z-index:1}
+.big .v{
+  font-size:clamp(1.75rem,7vw + .5rem,2.45rem);font-weight:750;letter-spacing:-.04em;
+  background:linear-gradient(180deg,var(--hero-top) 10%,var(--hero-bot));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 3px 8px var(--hero-glow));
+  overflow-wrap:anywhere;
+}
+.big .l{color:var(--muted);font-size:clamp(.85rem,2.5vw,.92rem);margin-top:2px}
+.tbl-wrap{position:relative;z-index:1;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
+table{width:100%;min-width:min(100%,280px);border-collapse:collapse;font-size:clamp(.84rem,2.2vw,.95rem);table-layout:fixed}
+td{padding:10px 4px;border-bottom:1px solid var(--table-line);vertical-align:top}
+td:first-child{width:58%;padding-right:10px;word-wrap:break-word;overflow-wrap:anywhere}
+td:last-child{width:42%;text-align:right;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;font-weight:550;white-space:nowrap}
+tr.neg td:last-child{color:var(--red)}
+tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;padding-top:14px}
+.note{font-size:clamp(.74rem,2.2vw,.8rem);color:var(--note);line-height:1.45;margin:4px 0 0;max-width:70ch}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .glass{background:var(--glass-fallback)}
+}
+@media (max-width:380px){
+  .glass{border-radius:20px;padding:14px}
+  .seg{gap:4px;padding:4px}
+  .seg button{font-size:.86rem;padding:8px 4px}
+}
+@media (max-width:640px){
+  .blob.a,.blob.b,.blob.c{width:min(78vw,420px);height:min(78vw,420px)}
+}
+@media (min-width:768px){
+  :root{--page-pad:20px}
+  .wrap{padding-top:max(18px,var(--sat))}
+}
+@media (min-width:1024px){
+  .wrap{padding-bottom:max(40px,var(--sab))}
+}
+@media (orientation:landscape) and (max-height:520px){
+  .wrap{padding-top:max(8px,var(--sat));padding-bottom:max(12px,var(--sab))}
+  .glass{padding:12px 14px;margin-bottom:10px;border-radius:18px}
+  h1{margin:2px 0;font-size:1.1rem}
+  p.sub{margin-bottom:8px}
+  .big{padding:2px 0}
+  .install,.theme-toggle{min-height:40px;padding:8px 12px}
+}
+/* Foldables: cover / narrow outer display */
+@media (spanning:single-fold-vertical),(max-width:400px){
+  .grid{grid-template-columns:1fr}
+}
+@media (spanning:single-fold-vertical){
+  .wrap{
+    width:min(100%,680px);
+    max-width:calc(100vw - var(--sal) - var(--sar) - var(--fold-left) - var(--fold-right));
+    padding-top:max(12px,var(--sat),var(--fold-top),calc(var(--fold-h)*.25));
+    padding-bottom:max(28px,var(--sab),var(--fold-bottom),calc(var(--fold-h)*.25));
+  }
+}
+/* Foldables: side-by-side panes — keep UI in one pane, clear of hinge */
+@media (spanning:single-fold-horizontal){
+  .grid{grid-template-columns:1fr}
+  .wrap{
+    width:100%;
+    max-width:min(780px,calc(50vw - var(--fold-w)*.5 - var(--sal) - var(--sar) - 20px));
+    margin-inline-start:max(var(--sal),var(--fold-left),var(--page-pad));
+    margin-inline-end:auto;
+    padding-inline:
+      max(var(--page-pad),var(--sal),var(--fold-left))
+      max(var(--page-pad),var(--sar),var(--fold-right));
+  }
+}
+@supports (horizontal-viewport-segments:2){
+  @media (spanning:single-fold-horizontal){
+    .wrap{
+      width:min(100%,env(viewport-segment-width 0 0,50vw));
+      max-width:min(780px,env(viewport-segment-width 0 0,50vw));
+      margin-inline-start:max(env(viewport-segment-left 0 0,0px),var(--sal),var(--fold-left));
+      margin-inline-end:auto;
+    }
+  }
+}
+@supports (vertical-viewport-segments:2){
+  @media (spanning:single-fold-vertical){
+    .wrap{
+      max-width:min(780px,env(viewport-segment-width 0 0,100vw));
+      margin-block-start:max(env(viewport-segment-top 0 0,0px),var(--sat),var(--fold-top));
+    }
+  }
+}
+@media (spanning:single-fold-horizontal) and (min-width:700px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Flex / half-fold landscape on narrow height */
+@media (spanning:single-fold-horizontal) and (orientation:landscape) and (max-height:520px){
+  .glass{padding:12px 14px;margin-bottom:10px}
+  .big .v{font-size:clamp(1.5rem,4vw + 1rem,2rem)}
+}
+/* Unfolded tablet-wide — same look, roomier measure */
+@media (spanning:none) and (min-width:600px) and (max-width:1100px){
+  .wrap{--content-w:min(100%,720px)}
+}
+@media (min-aspect-ratio:4/3) and (max-width:900px){
+  .blob{opacity:.34}
+}
+/* Sharper density on roomier viewports — not on narrow / closed fold */
+@media (min-width:421px) and (not (spanning:single-fold-vertical)){
+  p.sub{margin-bottom:12px}
+  .glass{
+    padding:16px;
+    margin-bottom:14px;
+    border-radius:24px;
+  }
+  .grid{gap:clamp(8px,1.8vw,12px);margin-top:10px}
+  label{margin-bottom:5px}
+  .big{padding:4px 0 6px}
+  td{padding:8px 4px}
+  tr.tot td{padding-top:11px}
+  .note{line-height:1.4}
+}
+@media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
+  body{text-rendering:geometricPrecision}
+  .glass,input,select,.seg,.install,.theme-toggle{
+    border-color:color-mix(in srgb,var(--stroke) 92%,#fff);
+  }
+  table{font-feature-settings:"tnum" 1,"lnum" 1}
+}
+@media (max-width:420px),(spanning:single-fold-vertical){
+  .grid{gap:clamp(10px,2.5vw,14px)}
+  .glass{padding:18px;margin-bottom:16px}
+  input,select{min-height:48px;padding:12px}
+}
+.main-cols{display:flex;flex-direction:column;gap:16px}
+@media (min-width:700px){
+  .main-cols{
+    display:grid;
+    grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);
+    gap:12px 14px;
+    align-items:start;
+  }
+  .main-cols .glass{margin-bottom:0}
+  .panel-results{
+    position:sticky;
+    top:max(8px,var(--sat),var(--fold-top));
+  }
+  .panel-inputs .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+  .panel-results .big{padding:2px 0 4px}
+  .panel-results td{padding:7px 4px}
+  .panel-results tr.tot td{padding-top:9px}
+}
+@media (min-width:700px) and (max-height:780px){
+  .main-cols{gap:10px 12px}
+  .main-cols .glass{padding:14px 15px;border-radius:22px}
+  .panel-inputs .grid{gap:8px;margin-top:8px}
+  .panel-inputs label{margin-bottom:4px}
+  .panel-inputs input,.panel-inputs select{min-height:46px;padding:10px 12px}
+  .panel-results .big{padding:0 0 2px}
+  .panel-results td{padding:6px 3px}
+  .hdr{margin-bottom:0}
+  p.sub{margin-bottom:10px}
+  .note{margin-top:10px}
+}
+@media (max-width:699px){
+  .main-cols .glass{margin-bottom:16px}
+  .main-cols .glass:last-child{margin-bottom:0}
+}
+</style>
+</head>
+<body>
+<div class="scene" aria-hidden="true"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="wrap">
+<header class="hdr">
+<div class="hdr-text">
+<h1>UK Take-Home Pay Calculator</h1>
+<p class="sub"><strong id="tax-year-label">2026/27</strong> tax year · England, Wales &amp; Northern Ireland</p>
+</div>
+<div class="hdr-actions">
+<button type="button" class="theme-toggle" id="theme" aria-label="Theme: system">Auto</button>
+<button type="button" class="install" id="install" hidden>Add to home screen</button>
+</div>
+</header>
+<p class="install-tip" id="install-tip" hidden></p>
+<div class="main-cols">
+<div class="card glass panel-inputs">
+<label>Period</label>
+<div class="seg" id="period">
+<button type="button" data-p="weekly">Weekly</button>
+<button type="button" data-p="monthly">Monthly</button>
+<button type="button" data-p="annual">Annual</button>
+</div>
+<div class="grid">
+<div class="field"><label for="rate">Hourly rate (£)</label><input id="rate" type="number" step="0.01" inputmode="decimal"></div>
+<div class="field"><label for="otrate">Overtime rate (£)</label><input id="otrate" type="number" step="0.01" inputmode="decimal"></div>
+<div class="field"><label for="hours">Standard hours (per period)</label><input id="hours" type="number" step="0.25" inputmode="decimal"></div>
+<div class="field"><label for="othours">Overtime hours (per period)</label><input id="othours" type="number" step="0.25" inputmode="decimal"></div>
+<div class="field"><label for="pension">Pension contribution (%)</label><input id="pension" type="number" step="0.1" inputmode="decimal"></div>
+<div class="field"><label for="sac">Extra salary sacrifice (£ per period)</label><input id="sac" type="number" step="0.01" inputmode="decimal"></div>
+<div class="field"><label for="code">Tax code</label><input id="code" type="text" autocapitalize="characters" spellcheck="false" autocomplete="off">
+<p class="code-warn" id="code-warn">This tax code wasn’t recognised — allowance treated as £0. Check yours on <a href="https://www.gov.uk/tax-codes" target="_blank" rel="noopener noreferrer">GOV.UK tax codes</a>.</p></div>
+<div class="field"><label for="sl">Student loan</label>
+<select id="sl">
+<option value=""></option>
+<option value="none">None</option>
+<option value="p1">Plan 1</option>
+<option value="p2">Plan 2</option>
+<option value="p4">Plan 4</option>
+<option value="p5">Plan 5</option>
+<option value="pg">Postgraduate</option>
+</select></div>
+</div>
+</div>
+<div class="card glass panel-results">
+<div class="big"><div class="v" id="net">—</div><div class="l" id="netl">Choose Weekly, Monthly or Annual</div></div>
+<div class="tbl-wrap"><table id="tbl" aria-live="polite"></table></div>
+</div>
+</div>
+<p class="note">Estimate only. Uses the tax year shown above. Pension and extra sacrifice reduce taxable pay and NI. Income tax is worked out annually then split across periods; NI uses period thresholds. Not for Scottish tax, benefits in kind, or exact payroll timing. Your payslip may differ.</p>
+</div>
+<script>
+/* ─── Tax year constants — update each April ─── */
+const TAX_YEAR='2026/27';
+const RATES={
+  personalAllowance:12570,
+  taperFrom:100000,
+  basicRateCeiling:50270,
+  additionalRateFrom:125140,
+  basicRate:0.20,
+  higherRate:0.40,
+  additionalRate:0.45,
+  periodsPerYear:{weekly:52,monthly:12,annual:1},
+  periodLabel:{weekly:'week',monthly:'month',annual:'year'},
+  ni:{
+    weekly:{pt:242,uel:967,main:0.08,upper:0.02},
+    monthly:{pt:1048,uel:4189,main:0.08,upper:0.02},
+    annual:{pt:12570,uel:50270,main:0.08,upper:0.02}
+  },
+  studentLoan:{
+    none:null,
+    p1:{threshold:26900,rate:0.09},
+    p2:{threshold:29385,rate:0.09},
+    p4:{threshold:33795,rate:0.09},
+    p5:{threshold:25000,rate:0.09},
+    pg:{threshold:21000,rate:0.06}
+  }
+};
+/* ─── end tax year block ─── */
+
+const STORE_KEY='take-home-settings-v2';
+const FIELD_IDS=['rate','otrate','hours','othours','pension','sac','code','sl'];
+let period=null;
+const $=id=>document.getElementById(id);
+const num=id=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:0};
+const gbp=v=>'£'+v.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const neg=v=>v>0?'−'+gbp(v):gbp(0);
+
+$('tax-year-label').textContent=TAX_YEAR;
+document.title='UK Take-Home Pay Calculator '+TAX_YEAR;
+
+function saveSettings(){
+  const data={period:period||''};
+  FIELD_IDS.forEach(id=>{data[id]=$(id).value});
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(data))}catch(_){}
+}
+function loadSettings(){
+  try{
+    let raw=localStorage.getItem(STORE_KEY);
+    if(!raw){
+      const legacy=localStorage.getItem('take-home-settings-v1');
+      if(legacy){raw=legacy;localStorage.setItem(STORE_KEY,legacy)}
+    }
+    if(!raw)return;
+    const data=JSON.parse(raw);
+    if(data.period&&RATES.periodsPerYear[data.period]){
+      period=data.period;
+      document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===period));
+    }
+    FIELD_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).value=data[id]});
+  }catch(_){}
+}
+function setPeriod(p){
+  period=p;
+  document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  calc();saveSettings();
+}
+document.querySelectorAll('#period button').forEach(b=>b.onclick=()=>setPeriod(b.dataset.p));
+
+function parseTaxCode(raw,annualIncome){
+  const code=String(raw||'').trim().toUpperCase().replace(/\s/g,'');
+  if(!code)return{mode:'unknown',allowance:0,unknown:true};
+  if(code==='BR')return{mode:'flat',rate:RATES.basicRate,unknown:false};
+  if(code==='D0')return{mode:'flat',rate:RATES.higherRate,unknown:false};
+  if(code==='D1')return{mode:'flat',rate:RATES.additionalRate,unknown:false};
+  const k=code.match(/^K(\d+)$/);
+  if(k)return{mode:'standard',allowance:-parseInt(k[1],10)*10,unknown:false};
+  const l=code.match(/^(\d+)L$/);
+  if(l){
+    let allowance=parseInt(l[1],10)*10;
+    if(annualIncome>RATES.taperFrom)allowance=Math.max(0,allowance-(annualIncome-RATES.taperFrom)/2);
+    return{mode:'standard',allowance,unknown:false};
+  }
+  return{mode:'unknown',allowance:0,unknown:true};
+}
+
+function calcAnnualIncomeTax(annualPay,codeInfo){
+  if(codeInfo.mode==='flat')return Math.max(0,annualPay)*codeInfo.rate;
+  const pa=codeInfo.mode==='standard'?codeInfo.allowance:0;
+  const taxable=annualPay-pa;
+  if(taxable<=0)return 0;
+  const basicWidth=RATES.basicRateCeiling-RATES.personalAllowance;
+  const higherCap=RATES.additionalRateFrom-pa;
+  return Math.min(taxable,basicWidth)*RATES.basicRate
+    +Math.max(0,Math.min(taxable,higherCap)-basicWidth)*RATES.higherRate
+    +Math.max(0,taxable-higherCap)*RATES.additionalRate;
+}
+
+function calcPeriodNI(periodPay){
+  const b=RATES.ni[period];
+  if(!b||periodPay<=0)return 0;
+  if(periodPay<=b.pt)return 0;
+  const mainBand=Math.max(0,Math.min(periodPay,b.uel)-b.pt);
+  const upperBand=Math.max(0,periodPay-b.uel);
+  return mainBand*b.main+upperBand*b.upper;
+}
+
+function calcAnnualStudentLoan(annualPay,planKey){
+  const plan=RATES.studentLoan[planKey];
+  if(!plan||annualPay<=plan.threshold)return 0;
+  return(annualPay-plan.threshold)*plan.rate;
+}
+
+function calc(){
+  const codeInfo=parseTaxCode($('code').value,0);
+  $('code-warn').classList.toggle('show',codeInfo.unknown);
+
+  if(!period){
+    $('net').textContent='—';
+    $('netl').textContent='Choose Weekly, Monthly or Annual';
+    $('tbl').innerHTML='';
+    return;
+  }
+
+  const freq=RATES.periodsPerYear[period];
+  const gross=num('hours')*num('rate')+num('othours')*num('otrate');
+  const penPct=num('pension');
+  const pen=gross*(penPct/100);
+  const extra=num('sac');
+  const sac=pen+extra;
+  const pay=Math.max(0,gross-sac);
+  const annualPay=pay*freq;
+
+  const codeResolved=parseTaxCode($('code').value,annualPay);
+  $('code-warn').classList.toggle('show',codeResolved.unknown);
+
+  const taxAnnual=calcAnnualIncomeTax(annualPay,codeResolved);
+  const T=taxAnnual/freq;
+  const N=calcPeriodNI(pay);
+
+  const slKey=$('sl').value;
+  const planKey=slKey===''?'none':slKey;
+  const slAnnual=planKey==='none'?0:calcAnnualStudentLoan(annualPay,planKey);
+  const S=slAnnual/freq;
+
+  const net=Math.max(0,pay-T-N-S);
+
+  $('net').textContent=gbp(net);
+  $('netl').textContent='Take-home per '+RATES.periodLabel[period];
+
+  const paShown=codeResolved.mode==='standard'?codeResolved.allowance:(codeResolved.mode==='flat'?0:0);
+  const r=(l,v,c='')=>`<tr class="${c}"><td>${l}</td><td>${v}</td></tr>`;
+  $('tbl').innerHTML=
+    r('Gross pay',gbp(gross))+
+    r('Pension (salary sacrifice)',neg(pen),'neg')+
+    r('Extra salary sacrifice',neg(extra),'neg')+
+    r('Pay after sacrifice',gbp(pay))+
+    r('Income tax',neg(T),'neg')+
+    r('National Insurance',neg(N),'neg')+
+    r('Student loan',neg(S),'neg')+
+    r('Take-home pay',gbp(net),'tot')+
+    r('Personal allowance (annual)',codeResolved.mode==='standard'?gbp(paShown):(codeResolved.unknown?'Not applied (unknown code)':'Not applied'))+
+    r('Annual take-home',gbp(net*freq));
+}
+
+function onFieldInput(){calc();saveSettings()}
+document.querySelectorAll('input,select').forEach(e=>{
+  e.addEventListener('input',onFieldInput);
+  e.addEventListener('change',onFieldInput);
+});
+loadSettings();calc();
+const THEME_KEY='take-home-theme';
+const THEME_CYCLE=['system','light','dark'];
+const THEME_LABEL={system:'Auto',light:'Light',dark:'Dark'};
+const THEME_COLOR={system:null,light:'#f6f3ec',dark:'#32363e'};
+const themeBtn=$('theme'),metaTheme=$('meta-theme');
+function resolvedTheme(){
+  const m=localStorage.getItem(THEME_KEY)||'system';
+  if(m==='light'||m==='dark')return m;
+  return matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';
+}
+function applyTheme(mode){
+  const m=THEME_CYCLE.includes(mode)?mode:'system';
+  try{localStorage.setItem(THEME_KEY,m)}catch(_){}
+  document.documentElement.setAttribute('data-theme',m);
+  if(themeBtn){
+    themeBtn.textContent=THEME_LABEL[m];
+    themeBtn.setAttribute('aria-label','Theme: '+THEME_LABEL[m]);
+  }
+  if(metaTheme){
+    const r=m==='system'?resolvedTheme():m;
+    metaTheme.setAttribute('content',THEME_COLOR[r]||'#32363e');
+  }
+}
+if(themeBtn){
+  applyTheme(localStorage.getItem(THEME_KEY)||'system');
+  themeBtn.onclick=()=>{
+    const cur=localStorage.getItem(THEME_KEY)||'system';
+    const i=THEME_CYCLE.indexOf(cur);
+    applyTheme(THEME_CYCLE[(i+1)%THEME_CYCLE.length]);
+  };
+}
+matchMedia('(prefers-color-scheme: light)').addEventListener('change',()=>{
+  if((localStorage.getItem(THEME_KEY)||'system')==='system')applyTheme('system');
+});
+let installEvt=null;const installBtn=$('install'),installTip=$('install-tip');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;installBtn.hidden=false});
+installBtn.onclick=async()=>{if(installEvt){installEvt.prompt();installEvt=null;installBtn.hidden=true}else installTip.hidden=false};
+function showIosInstallTip(){const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ const standalone=matchMedia('(display-mode:standalone)').matches||navigator.standalone;
+ if(ios&&!standalone){installBtn.hidden=false;installBtn.textContent='Save to Home Screen';
+  installTip.textContent='Tap Share, then “Add to Home Screen”. Your inputs are saved on this device for next time.';
+  installBtn.onclick=()=>{installTip.hidden=false}}}
+showIosInstallTip();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>

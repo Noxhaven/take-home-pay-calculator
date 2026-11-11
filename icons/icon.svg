@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Take-Home Pay">
+  <defs>
+    <linearGradient id="sage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8efe6"/>
+      <stop offset="1" stop-color="#cdd9cb"/>
+    </linearGradient>
+    <linearGradient id="slate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3f47"/>
+      <stop offset="1" stop-color="#2e3238"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#slate)"/>
+  <rect x="56" y="56" width="400" height="400" rx="84" fill="url(#sage)"/>
+  <text x="256" y="296" text-anchor="middle" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="188" font-weight="700" fill="#9a7230">£</text>
+</svg>
