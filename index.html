@@ -706,7 +706,19 @@ function showIosInstallTip(){const ios=/iPad|iPhone|iPod/.test(navigator.userAge
   installTip.textContent='Tap Share, then “Add to Home Screen”. Your inputs are saved on this device for next time.';
   installBtn.onclick=()=>{installTip.hidden=false}}}
 showIosInstallTip();
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if('serviceWorker' in navigator){
+  let reloadOnCtrl=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloadOnCtrl){reloadOnCtrl=false;location.reload()}});
+  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>{
+    reg.update();
+    reg.addEventListener('updatefound',()=>{
+      const w=reg.installing;
+      if(!w)return;
+      w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)reloadOnCtrl=true});
+    });
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update()});
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
