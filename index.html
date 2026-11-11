@@ -440,6 +440,13 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
   .main-cols .glass{margin-bottom:16px}
   .main-cols .glass:last-child{margin-bottom:0}
 }
+.chk-row{display:flex;align-items:flex-start;gap:10px;margin-top:2px}
+.chk-row input[type=checkbox]{width:20px;height:20px;min-height:20px;margin:2px 0 0;padding:0;flex:0 0 auto;accent-color:var(--hero-bot)}
+.chk-row label{margin:0;font-weight:600;cursor:pointer;flex:1}
+.field-span{grid-column:1/-1}
+.sect{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:8px 0 2px}
+.hint{font-size:.72rem;color:var(--note);font-weight:500;margin-top:4px;line-height:1.35}
+.reset-btn{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -448,35 +455,77 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
 <div class="wrap">
 <header class="hdr">
 <div class="hdr-text">
-<h1>UK Take-Home Pay Calculator</h1>
-<p class="sub"><strong id="tax-year-label">2026/27</strong> tax year · England, Wales &amp; Northern Ireland</p>
+<h1>UK Shift Pay Calculator</h1>
+<p class="sub" id="region-label"><strong id="tax-year-label">2026/27</strong> · shift &amp; overtime pay estimate</p>
 </div>
 <div class="hdr-actions">
+<button type="button" class="theme-toggle reset-btn" id="reset" aria-label="Reset all inputs">Reset</button>
 <button type="button" class="theme-toggle" id="theme" aria-label="Theme: system">Auto</button>
 <button type="button" class="install" id="install" hidden>Add to home screen</button>
 </div>
 </header>
 <p class="install-tip" id="install-tip" hidden></p>
 <div class="main-cols">
-<div class="card glass panel-inputs">
+<div class="card glass panel-inputs" id="panel-inputs">
 <label>Period</label>
 <div class="seg" id="period">
 <button type="button" data-p="weekly">Weekly</button>
-<button type="button" data-p="monthly">Monthly</button>
+<button type="button" data-p="monthly" class="on">Monthly</button>
 <button type="button" data-p="annual">Annual</button>
 </div>
 <div class="grid">
-<div class="field"><label for="rate">Hourly rate (£)</label><input id="rate" type="number" step="0.01" inputmode="decimal"></div>
-<div class="field"><label for="otrate">Overtime rate (£)</label><input id="otrate" type="number" step="0.01" inputmode="decimal"></div>
-<div class="field"><label for="hours">Standard hours (per period)</label><input id="hours" type="number" step="0.25" inputmode="decimal"></div>
-<div class="field"><label for="othours">Overtime hours (per period)</label><input id="othours" type="number" step="0.25" inputmode="decimal"></div>
-<div class="field"><label for="pension">Pension contribution (%)</label><input id="pension" type="number" step="0.1" inputmode="decimal"></div>
-<div class="field"><label for="sac">Extra salary sacrifice (£ per period)</label><input id="sac" type="number" step="0.01" inputmode="decimal"></div>
-<div class="field"><label for="code">Tax code</label><input id="code" type="text" autocapitalize="characters" spellcheck="false" autocomplete="off">
+<p class="sect field-span">Contract &amp; shifts (per month)</p>
+<div class="field"><label for="baseRate">Base hourly rate (£)</label><input id="baseRate" type="number" step="0.01" inputmode="decimal" placeholder="e.g. 15.00"></div>
+<div class="field"><label for="supplementRate">Hourly supplement (£, optional)</label><input id="supplementRate" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="weeklyHours">Contracted hours / week</label><input id="weeklyHours" type="number" step="0.25" inputmode="decimal" value="40"></div>
+<div class="field"><label for="weeksPerMonth">Weeks per month</label><input id="weeksPerMonth" type="number" step="0.01" inputmode="decimal" value="4.35"></div>
+<div class="field"><label for="shiftLength">Shift length (hours)</label><input id="shiftLength" type="number" step="0.25" inputmode="decimal" value="12"></div>
+<div class="field"><label for="unpaidBreak">Unpaid break (hours)</label><input id="unpaidBreak" type="number" step="0.05" inputmode="decimal" value="0.75"></div>
+<div class="field"><label for="shifts">Shifts this month</label><input id="shifts" type="number" step="1" inputmode="numeric" placeholder="—"></div>
+<div class="field"><label for="shiftAllowPct">Shift allowance (% of basic)</label><input id="shiftAllowPct" type="number" step="0.1" inputmode="decimal" placeholder="e.g. 6"></div>
+<div class="field field-span chk-row"><input type="checkbox" id="allowanceIncSupp"><label for="allowanceIncSupp">Include supplement in shift-allowance base</label></div>
+
+<p class="sect field-span">Overtime &amp; time bank</p>
+<div class="field"><label for="otHours">Overtime hours (this month)</label><input id="otHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="otMult">Overtime multiplier</label><input id="otMult" type="number" step="0.05" inputmode="decimal" value="1.5"></div>
+<div class="field"><label for="otBankCap">Time-bank cap (hours / month)</label><input id="otBankCap" type="number" step="1" inputmode="numeric" placeholder="e.g. 24"><p class="hint">First N hrs: only the premium is paid; base goes to time bank</p></div>
+<div class="field field-span"><label for="otExcess">Overtime above cap</label>
+<select id="otExcess">
+<option value="full_next">Paid in full this month</option>
+<option value="hold_second">Held in second time account (not paid)</option>
+<option value="threshold">Paid only when second account reaches threshold</option>
+</select></div>
+<div class="field ot-threshold" hidden><label for="secondBankHrs">Second account balance (hours)</label><input id="secondBankHrs" type="number" step="0.25" inputmode="decimal" value="0"></div>
+<div class="field ot-threshold" hidden><label for="secondThreshold">Payout threshold (hours)</label><input id="secondThreshold" type="number" step="1" inputmode="numeric" placeholder="e.g. 40"></div>
+
+<p class="sect field-span">Premium hours</p>
+<div class="field"><label for="premHours">Premium hours (e.g. nights / BH)</label><input id="premHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="premPct">Premium (% of hourly base)</label><input id="premPct" type="number" step="1" inputmode="decimal" value="50"></div>
+<div class="field"><label for="premBase">Premium calculated on</label>
+<select id="premBase">
+<option value="base">Base rate only</option>
+<option value="blended">Base + supplement</option>
+</select></div>
+<div class="field"><label for="overlapHrs">Overlap hrs (premium wins)</label><input id="overlapHrs" type="number" step="0.25" inputmode="decimal" placeholder="0"><p class="hint">Hours that earn premium, not OT premium</p></div>
+
+<p class="sect field-span">Arrears &amp; bonus</p>
+<div class="field field-span chk-row"><input type="checkbox" id="arrears"><label for="arrears">Variable pay one month in arrears (basic now; supplement, allowance, OT &amp; premiums last month)</label></div>
+<div class="field arrears-only" hidden><label for="prevShifts">Last month: shifts</label><input id="prevShifts" type="number" step="1" inputmode="numeric" placeholder="0"></div>
+<div class="field arrears-only" hidden><label for="prevOtHours">Last month: OT hours</label><input id="prevOtHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field arrears-only" hidden><label for="prevPremHours">Last month: premium hours</label><input id="prevPremHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field arrears-only" hidden><label for="prevOverlap">Last month: overlap hours</label><input id="prevOverlap" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="bonus">Bonus (£ this month)</label><input id="bonus" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
+
+<p class="sect field-span">Tax, NI &amp; student loan</p>
+<div class="field"><label for="region">Income tax region</label>
+<select id="region">
+<option value="ewni">England, Wales &amp; NI</option>
+<option value="scot">Scotland</option>
+</select></div>
+<div class="field"><label for="code">Tax code</label><input id="code" type="text" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="1257L">
 <p class="code-warn" id="code-warn">This tax code wasn’t recognised — allowance treated as £0. Check yours on <a href="https://www.gov.uk/tax-codes" target="_blank" rel="noopener noreferrer">GOV.UK tax codes</a>.</p></div>
 <div class="field"><label for="sl">Student loan</label>
 <select id="sl">
-<option value=""></option>
 <option value="none">None</option>
 <option value="p1">Plan 1</option>
 <option value="p2">Plan 2</option>
@@ -484,6 +533,19 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
 <option value="p5">Plan 5</option>
 <option value="pg">Postgraduate</option>
 </select></div>
+
+<p class="sect field-span">Pension</p>
+<div class="field"><label for="penMode">Method</label>
+<select id="penMode">
+<option value="ras">Relief at source (after tax &amp; NI; HMRC +20%)</option>
+<option value="netpay">Net pay arrangement (before tax)</option>
+<option value="sacrifice">Salary sacrifice (before tax &amp; NI)</option>
+</select></div>
+<div class="field"><label for="pension">Employee % (of pensionable)</label><input id="pension" type="number" step="0.1" inputmode="decimal" placeholder="e.g. 5"></div>
+<div class="field"><label for="pensionEr">Employer % (info only)</label><input id="pensionEr" type="number" step="0.1" inputmode="decimal" placeholder="—"></div>
+<div class="field field-span chk-row"><input type="checkbox" id="penExclOt" checked><label for="penExclOt">Exclude overtime premium from pensionable pay</label></div>
+<div class="field field-span chk-row"><input type="checkbox" id="penExclSupp" checked><label for="penExclSupp">Exclude supplement from pensionable pay</label></div>
+<div class="field field-span chk-row"><input type="checkbox" id="penExclPrem" checked><label for="penExclPrem">Exclude premium hours pay from pensionable pay</label></div>
 </div>
 </div>
 <div class="card glass panel-results">
@@ -491,7 +553,7 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
 <div class="tbl-wrap"><table id="tbl" aria-live="polite"></table></div>
 </div>
 </div>
-<p class="note">Estimate only. Uses the tax year shown above. Pension and extra sacrifice reduce taxable pay and NI. Income tax is worked out annually then split across periods; NI uses period thresholds. Not for Scottish tax, benefits in kind, or exact payroll timing. Your payslip may differ.</p>
+<p class="note">Estimate only — enter your own figures. Inputs stay on this device (local storage). Income tax is annualised then split; NI uses period thresholds (category A). Time-bank and arrears rules are simplified. Not for benefits in kind, exact payroll timing, or every scheme rule. Your payslip may differ.</p>
 </div>
 <script>
 /* ─── Tax year constants — update each April ─── */
@@ -504,6 +566,13 @@ const RATES={
   basicRate:0.20,
   higherRate:0.40,
   additionalRate:0.45,
+  scotlandBands:[
+    {up:2306,rate:0.19},
+    {up:13990,rate:0.20},
+    {up:31092,rate:0.21},
+    {up:62430,rate:0.42},
+    {up:Infinity,rate:0.48}
+  ],
   periodsPerYear:{weekly:52,monthly:12,annual:1},
   periodLabel:{weekly:'week',monthly:'month',annual:'year'},
   ni:{
@@ -522,44 +591,80 @@ const RATES={
 };
 /* ─── end tax year block ─── */
 
-const STORE_KEY='take-home-settings-v2';
-const FIELD_IDS=['rate','otrate','hours','othours','pension','sac','code','sl'];
-let period=null;
+const STORE_KEY='take-home-settings-v3-shift';
+const FIELD_IDS=['baseRate','supplementRate','weeklyHours','weeksPerMonth','shiftLength','unpaidBreak','shifts','shiftAllowPct','otHours','otMult','otBankCap','secondBankHrs','secondThreshold','premHours','premPct','overlapHrs','prevShifts','prevOtHours','prevPremHours','prevOverlap','bonus','code','pension','pensionEr','sl'];
+const SELECT_IDS=['otExcess','premBase','region','penMode'];
+const BOOL_IDS=['allowanceIncSupp','arrears','penExclOt','penExclSupp','penExclPrem'];
+let period='monthly';
 const $=id=>document.getElementById(id);
 const num=id=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:0};
+const chk=id=>!!$(id)?.checked;
 const gbp=v=>'£'+v.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
 const neg=v=>v>0?'−'+gbp(v):gbp(0);
 
 $('tax-year-label').textContent=TAX_YEAR;
-document.title='UK Take-Home Pay Calculator '+TAX_YEAR;
+document.title='UK Shift Pay Calculator '+TAX_YEAR;
+
+function updateRegionLabel(){
+  const sc=$('region').value==='scot';
+  $('region-label').innerHTML='<strong id="tax-year-label">'+TAX_YEAR+'</strong> · '+(sc?'Scottish income tax':'England, Wales &amp; NI');
+  $('tax-year-label').textContent=TAX_YEAR;
+}
 
 function saveSettings(){
-  const data={period:period||''};
+  const data={period};
   FIELD_IDS.forEach(id=>{data[id]=$(id).value});
+  SELECT_IDS.forEach(id=>{data[id]=$(id).value});
+  BOOL_IDS.forEach(id=>{data[id]=chk(id)});
   try{localStorage.setItem(STORE_KEY,JSON.stringify(data))}catch(_){}
 }
 function loadSettings(){
   try{
-    let raw=localStorage.getItem(STORE_KEY);
-    if(!raw){
-      const legacy=localStorage.getItem('take-home-settings-v1');
-      if(legacy){raw=legacy;localStorage.setItem(STORE_KEY,legacy)}
-    }
+    const raw=localStorage.getItem(STORE_KEY);
     if(!raw)return;
     const data=JSON.parse(raw);
-    if(data.period&&RATES.periodsPerYear[data.period]){
-      period=data.period;
-      document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===period));
-    }
+    if(data.period&&RATES.periodsPerYear[data.period])period=data.period;
     FIELD_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).value=data[id]});
+    SELECT_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).value=data[id]});
+    BOOL_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).checked=!!data[id]});
   }catch(_){}
 }
+function syncUi(){
+  document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===period));
+  document.querySelectorAll('.arrears-only').forEach(el=>{el.hidden=!chk('arrears')});
+  const thresh=$('otExcess').value==='threshold';
+  document.querySelectorAll('.ot-threshold').forEach(el=>{el.hidden=!thresh});
+  updateRegionLabel();
+}
 function setPeriod(p){
-  period=p;
-  document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
-  calc();saveSettings();
+  period=p;syncUi();calc();saveSettings();
 }
 document.querySelectorAll('#period button').forEach(b=>b.onclick=()=>setPeriod(b.dataset.p));
+$('otExcess').addEventListener('change',()=>{syncUi();calc();saveSettings()});
+$('region').addEventListener('change',()=>{syncUi();calc();saveSettings()});
+['arrears'].forEach(id=>$(id).addEventListener('change',()=>{syncUi();calc();saveSettings()}));
+$('reset').onclick=()=>{
+  if(!confirm('Clear all inputs saved on this device?'))return;
+  try{localStorage.removeItem(STORE_KEY)}catch(_){}
+  document.querySelectorAll('#panel-inputs input[type=number],#panel-inputs input[type=text]').forEach(el=>{
+    if(el.id==='weeklyHours')el.value='40';
+    else if(el.id==='weeksPerMonth')el.value='4.35';
+    else if(el.id==='shiftLength')el.value='12';
+    else if(el.id==='unpaidBreak')el.value='0.75';
+    else if(el.id==='otMult')el.value='1.5';
+    else if(el.id==='premPct')el.value='50';
+    else if(el.id==='secondBankHrs')el.value='0';
+    else el.value='';
+  });
+  BOOL_IDS.forEach(id=>{$(id).checked=id==='penExclOt'||id==='penExclSupp'||id==='penExclPrem'});
+  $('otExcess').value='full_next';
+  $('premBase').value='base';
+  $('region').value='ewni';
+  $('penMode').value='ras';
+  $('sl').value='none';
+  period='monthly';
+  syncUi();calc();saveSettings();
+};
 
 function parseTaxCode(raw,annualIncome){
   const code=String(raw||'').trim().toUpperCase().replace(/\s/g,'');
@@ -578,7 +683,7 @@ function parseTaxCode(raw,annualIncome){
   return{mode:'unknown',allowance:0,unknown:true};
 }
 
-function calcAnnualIncomeTax(annualPay,codeInfo){
+function calcAnnualIncomeTaxEw(annualPay,codeInfo){
   if(codeInfo.mode==='flat')return Math.max(0,annualPay)*codeInfo.rate;
   const pa=codeInfo.mode==='standard'?codeInfo.allowance:0;
   const taxable=annualPay-pa;
@@ -588,6 +693,25 @@ function calcAnnualIncomeTax(annualPay,codeInfo){
   return Math.min(taxable,basicWidth)*RATES.basicRate
     +Math.max(0,Math.min(taxable,higherCap)-basicWidth)*RATES.higherRate
     +Math.max(0,taxable-higherCap)*RATES.additionalRate;
+}
+
+function calcAnnualIncomeTaxScot(annualPay,codeInfo){
+  if(codeInfo.mode==='flat')return Math.max(0,annualPay)*codeInfo.rate;
+  const pa=codeInfo.mode==='standard'?codeInfo.allowance:0;
+  const taxable=annualPay-pa;
+  if(taxable<=0)return 0;
+  let tax=0,prev=0;
+  for(const band of RATES.scotlandBands){
+    const slice=Math.max(0,Math.min(taxable,band.up)-prev);
+    tax+=slice*band.rate;
+    prev=band.up;
+    if(taxable<=band.up)break;
+  }
+  return tax;
+}
+
+function calcAnnualIncomeTax(annualPay,codeInfo,region){
+  return region==='scot'?calcAnnualIncomeTaxScot(annualPay,codeInfo):calcAnnualIncomeTaxEw(annualPay,codeInfo);
 }
 
 function calcPeriodNI(periodPay){
@@ -605,56 +729,153 @@ function calcAnnualStudentLoan(annualPay,planKey){
   return(annualPay-plan.threshold)*plan.rate;
 }
 
-function calc(){
-  const codeInfo=parseTaxCode($('code').value,0);
-  $('code-warn').classList.toggle('show',codeInfo.unknown);
+function paidPerShift(){return Math.max(0,num('shiftLength')-num('unpaidBreak'))}
 
+function calcOtBlock(otHours,base,sup,mult,bankCap,excessMode){
+  const blended=base+sup;
+  const m=Math.max(1,mult);
+  const premiumRate=blended*(m-1);
+  const fullRate=blended*m;
+  const cap=Math.max(0,bankCap);
+  const ot=Math.max(0,otHours);
+  const banked=Math.min(ot,cap);
+  const excess=Math.max(0,ot-cap);
+  let otPay=banked*premiumRate;
+  let secondBank=num('secondBankHrs');
+  let excessPay=0;
+  let payoutNote='';
+  if(excess>0){
+    if(excessMode==='full_next'){
+      excessPay=excess*fullRate;
+      payoutNote='excess paid at ×'+m;
+    }else if(excessMode==='hold_second'){
+      secondBank+=excess;
+      payoutNote=excess.toFixed(2)+' h held in second account';
+    }else{
+      const thresh=num('secondThreshold');
+      const before=secondBank;
+      secondBank+=excess;
+      if(thresh>0&&before<thresh&&secondBank>=thresh){
+        excessPay=secondBank*fullRate;
+        payoutNote='second account paid at threshold';
+        secondBank=0;
+      }else payoutNote=secondBank.toFixed(2)+' h in second account';
+    }
+  }
+  otPay+=excessPay;
+  const premiumPart=banked*premiumRate+(excessMode==='full_next'?excessPay:excessMode==='threshold'&&excessPay?excessPay:0);
+  return{otPay,banked,bankedHours:banked,excessHours:excess,premiumPart,blended,fullRate,secondBank,payoutNote,baseOtHours:ot};
+}
+
+function calcPremiumPay(premHours,base,sup){
+  const hr=$('premBase').value==='blended'?base+sup:base;
+  return Math.max(0,premHours)*hr*(num('premPct')/100);
+}
+
+function buildMonth(shifts,otHours,premHours,overlapH){
+  const base=num('baseRate');
+  const sup=num('supplementRate');
+  const paidH=paidPerShift();
+  const monthlyBasic=base*num('weeklyHours')*num('weeksPerMonth');
+  const supplementPay=sup*shifts*paidH;
+  const allowBase=monthlyBasic+(chk('allowanceIncSupp')?supplementPay:0);
+  const shiftAllow=allowBase*(num('shiftAllowPct')/100);
+  const overlap=Math.min(Math.max(0,overlapH),Math.max(0,otHours),Math.max(0,premHours));
+  const otEligible=Math.max(0,otHours-overlap);
+  const ot=calcOtBlock(otEligible,base,sup,num('otMult')||1.5,num('otBankCap'),$('otExcess').value);
+  const premPay=calcPremiumPay(premHours,base,sup);
+  return{monthlyBasic,supplementPay,shiftAllow,premPay,overlap,otEligible,...ot};
+}
+
+function pensionableFrom(m){
+  const bonus=num('bonus');
+  let p=m.monthlyBasic+m.shiftAllow+bonus;
+  if(!chk('penExclSupp'))p+=m.supplementPay;
+  if(!chk('penExclPrem'))p+=m.premPay;
+  const baseOt=m.otEligible*m.blended;
+  if(chk('penExclOt'))p+=baseOt;
+  else p+=baseOt+m.premiumPart;
+  return Math.max(0,p);
+}
+
+function toPeriod(monthly){return monthly*(12/RATES.periodsPerYear[period])}
+
+function calc(){
+  $('code-warn').classList.toggle('show',parseTaxCode($('code').value,0).unknown);
   if(!period){
     $('net').textContent='—';
     $('netl').textContent='Choose Weekly, Monthly or Annual';
     $('tbl').innerHTML='';
     return;
   }
-
   const freq=RATES.periodsPerYear[period];
-  const gross=num('hours')*num('rate')+num('othours')*num('otrate');
+  const region=$('region').value;
+  const arrears=chk('arrears');
+  const cur=buildMonth(num('shifts'),num('otHours'),num('premHours'),num('overlapHrs'));
+  const varM=arrears
+    ?buildMonth(num('prevShifts'),num('prevOtHours'),num('prevPremHours'),num('prevOverlap'))
+    :cur;
+  const basicM=cur.monthlyBasic;
+  const bonus=num('bonus');
+  const grossMonth=basicM+varM.supplementPay+varM.shiftAllow+varM.otPay+varM.premPay+bonus;
+  const gross=toPeriod(grossMonth);
+
+  const pensionableMonth=pensionableFrom(arrears?{...varM,monthlyBasic:basicM}:cur);
   const penPct=num('pension');
-  const pen=gross*(penPct/100);
-  const extra=num('sac');
-  const sac=pen+extra;
-  const pay=Math.max(0,gross-sac);
-  const annualPay=pay*freq;
+  const penMode=$('penMode').value;
+  const penMonth=pensionableMonth*(penPct/100);
+  const penPeriod=toPeriod(penMonth);
+  const penErMonth=pensionableMonth*(num('pensionEr')/100);
 
-  const codeResolved=parseTaxCode($('code').value,annualPay);
+  let taxable=gross;
+  if(penMode==='sacrifice'||penMode==='netpay')taxable=Math.max(0,gross-penPeriod);
+  const annualTaxable=taxable*freq;
+
+  const codeResolved=parseTaxCode($('code').value,annualTaxable);
   $('code-warn').classList.toggle('show',codeResolved.unknown);
-
-  const taxAnnual=calcAnnualIncomeTax(annualPay,codeResolved);
+  const taxAnnual=calcAnnualIncomeTax(annualTaxable,codeResolved,region);
   const T=taxAnnual/freq;
-  const N=calcPeriodNI(pay);
-
-  const slKey=$('sl').value;
-  const planKey=slKey===''?'none':slKey;
-  const slAnnual=planKey==='none'?0:calcAnnualStudentLoan(annualPay,planKey);
+  const N=calcPeriodNI(taxable);
+  const slKey=$('sl').value||'none';
+  const slAnnual=slKey==='none'?0:calcAnnualStudentLoan(annualTaxable,slKey);
   const S=slAnnual/freq;
 
-  const net=Math.max(0,pay-T-N-S);
+  const penDeduct=penMode==='ras'?penPeriod:penMode==='netpay'?0:0;
+  const penSac=penMode==='sacrifice'?0:penMode==='netpay'?penPeriod:0;
+  const net=Math.max(0,taxable-T-N-S-penDeduct);
 
   $('net').textContent=gbp(net);
   $('netl').textContent='Take-home per '+RATES.periodLabel[period];
 
-  const paShown=codeResolved.mode==='standard'?codeResolved.allowance:(codeResolved.mode==='flat'?0:0);
   const r=(l,v,c='')=>`<tr class="${c}"><td>${l}</td><td>${v}</td></tr>`;
-  $('tbl').innerHTML=
-    r('Gross pay',gbp(gross))+
-    r('Pension (salary sacrifice)',neg(pen),'neg')+
-    r('Extra salary sacrifice',neg(extra),'neg')+
-    r('Pay after sacrifice',gbp(pay))+
-    r('Income tax',neg(T),'neg')+
-    r('National Insurance',neg(N),'neg')+
-    r('Student loan',neg(S),'neg')+
-    r('Take-home pay',gbp(net),'tot')+
-    r('Personal allowance (annual)',codeResolved.mode==='standard'?gbp(paShown):(codeResolved.unknown?'Not applied (unknown code)':'Not applied'))+
-    r('Annual take-home',gbp(net*freq));
+  const tag=arrears?' <span style="font-weight:500;color:var(--muted)">(arrears)</span>':'';
+  const rows=[
+    r('Basic (contracted)'+tag,gbp(toPeriod(basicM))),
+    varM.supplementPay?r('Supplement'+tag,gbp(toPeriod(varM.supplementPay))):'',
+    varM.shiftAllow?r('Shift allowance'+tag,gbp(toPeriod(varM.shiftAllow))):'',
+    varM.premPay?r('Premium hours'+tag,gbp(toPeriod(varM.premPay))):'',
+    varM.otPay?r('Overtime pay'+tag,gbp(toPeriod(varM.otPay))):'',
+    bonus?r('Bonus',gbp(toPeriod(bonus))):'',
+    r('Gross pay',gbp(gross)),
+    penMode==='sacrifice'?r('Pension (salary sacrifice)',neg(penPeriod),'neg'):'',
+    penMode==='sacrifice'?'':r('Pay for tax &amp; NI',gbp(taxable)),
+    r('Income tax',neg(T),'neg'),
+    r('National Insurance',neg(N),'neg'),
+    r('Student loan',neg(S),'neg'),
+    penMode==='ras'?r('Pension (relief at source)',neg(penPeriod),'neg'):'',
+    penMode==='netpay'?r('Pension (net pay)',neg(penPeriod),'neg'):'',
+    r('Take-home pay',gbp(net),'tot'),
+    penPct?r('Pensionable pay',gbp(toPeriod(pensionableMonth))):'',
+    num('pensionEr')?r('Employer pension (info)',gbp(toPeriod(penErMonth))):'',
+    penMode==='ras'&&penPct?r('Gross pension (RAS +20%)',gbp(toPeriod(penMonth/0.8))):'',
+    r('Personal allowance (annual)',codeResolved.mode==='standard'?gbp(codeResolved.allowance):(codeResolved.unknown?'Unknown code':'N/A')),
+    r('Annual take-home',gbp(net*freq))
+  ];
+  const bank=[];
+  if(varM.bankedHours)bank.push(r('Time bank (this month)',varM.bankedHours.toFixed(2)+' h'));
+  if(varM.excessHours&&$('otExcess').value!=='full_next')bank.push(r('Second account',varM.secondBank.toFixed(2)+' h'));
+  if(varM.payoutNote&&$('otExcess').value!=='full_next')bank.push(r('OT above cap',varM.payoutNote));
+  $('tbl').innerHTML=rows.join('')+bank.join('');
 }
 
 function onFieldInput(){calc();saveSettings()}
@@ -662,7 +883,7 @@ document.querySelectorAll('input,select').forEach(e=>{
   e.addEventListener('input',onFieldInput);
   e.addEventListener('change',onFieldInput);
 });
-loadSettings();calc();
+loadSettings();syncUi();calc();
 const THEME_KEY='take-home-theme';
 const THEME_CYCLE=['system','light','dark'];
 const THEME_LABEL={system:'Auto',light:'Light',dark:'Dark'};
