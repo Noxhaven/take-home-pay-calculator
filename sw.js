@@ -1,4 +1,4 @@
-const CACHE = 'take-home-v8';
+const CACHE = 'take-home-v9';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon.svg', './icons/icon-maskable.svg'];
 
 self.addEventListener('install', e => {

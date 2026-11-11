@@ -471,6 +471,12 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
 <div class="field"><label for="hours">Standard hours (per period)</label><input id="hours" type="number" step="0.25" inputmode="decimal"></div>
 <div class="field"><label for="othours">Overtime hours (per period)</label><input id="othours" type="number" step="0.25" inputmode="decimal"></div>
 <div class="field"><label for="pension">Pension contribution (%)</label><input id="pension" type="number" step="0.1" inputmode="decimal"></div>
+<div class="field"><label for="bonus">Bonus (optional)</label>
+<div class="seg" id="bonusMode">
+<button type="button" data-m="fixed" class="on">£</button>
+<button type="button" data-m="pct">%</button>
+</div>
+<input id="bonus" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
 <div class="field"><label for="sac">Extra salary sacrifice (£ per period)</label><input id="sac" type="number" step="0.01" inputmode="decimal"></div>
 <div class="field"><label for="code">Tax code</label><input id="code" type="text" autocapitalize="characters" spellcheck="false" autocomplete="off">
 <p class="code-warn" id="code-warn">This tax code wasn’t recognised — allowance treated as £0. Check yours on <a href="https://www.gov.uk/tax-codes" target="_blank" rel="noopener noreferrer">GOV.UK tax codes</a>.</p></div>
@@ -523,8 +529,9 @@ const RATES={
 /* ─── end tax year block ─── */
 
 const STORE_KEY='take-home-settings-v2';
-const FIELD_IDS=['rate','otrate','hours','othours','pension','sac','code','sl'];
+const FIELD_IDS=['rate','otrate','hours','othours','pension','bonus','sac','code','sl'];
 let period=null;
+let bonusMode='fixed';
 const $=id=>document.getElementById(id);
 const num=id=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:0};
 const gbp=v=>'£'+v.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -534,7 +541,7 @@ $('tax-year-label').textContent=TAX_YEAR;
 document.title='UK Take-Home Pay Calculator '+TAX_YEAR;
 
 function saveSettings(){
-  const data={period:period||''};
+  const data={period:period||'',bonusMode};
   FIELD_IDS.forEach(id=>{data[id]=$(id).value});
   try{localStorage.setItem(STORE_KEY,JSON.stringify(data))}catch(_){}
 }
@@ -551,8 +558,13 @@ function loadSettings(){
       period=data.period;
       document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===period));
     }
+    if(data.bonusMode==='pct'||data.bonusMode==='fixed')bonusMode=data.bonusMode;
+    syncBonusModeUi();
     FIELD_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).value=data[id]});
   }catch(_){}
+}
+function syncBonusModeUi(){
+  document.querySelectorAll('#bonusMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===bonusMode));
 }
 function setPeriod(p){
   period=p;
@@ -560,6 +572,9 @@ function setPeriod(p){
   calc();saveSettings();
 }
 document.querySelectorAll('#period button').forEach(b=>b.onclick=()=>setPeriod(b.dataset.p));
+document.querySelectorAll('#bonusMode button').forEach(b=>b.onclick=()=>{
+  bonusMode=b.dataset.m;syncBonusModeUi();calc();saveSettings();
+});
 
 function parseTaxCode(raw,annualIncome){
   const code=String(raw||'').trim().toUpperCase().replace(/\s/g,'');
@@ -617,7 +632,10 @@ function calc(){
   }
 
   const freq=RATES.periodsPerYear[period];
-  const gross=num('hours')*num('rate')+num('othours')*num('otrate');
+  const payBeforeBonus=num('hours')*num('rate')+num('othours')*num('otrate');
+  const bonusIn=num('bonus');
+  const bonus=bonusIn>0?(bonusMode==='pct'?payBeforeBonus*(bonusIn/100):bonusIn):0;
+  const gross=payBeforeBonus+bonus;
   const penPct=num('pension');
   const pen=gross*(penPct/100);
   const extra=num('sac');
@@ -644,7 +662,10 @@ function calc(){
 
   const paShown=codeResolved.mode==='standard'?codeResolved.allowance:(codeResolved.mode==='flat'?0:0);
   const r=(l,v,c='')=>`<tr class="${c}"><td>${l}</td><td>${v}</td></tr>`;
+  const bonusRow=bonus>0?r('Bonus',gbp(bonus)): '';
   $('tbl').innerHTML=
+    (bonus>0?r('Pay before bonus',gbp(payBeforeBonus)): '')+
+    bonusRow+
     r('Gross pay',gbp(gross))+
     r('Pension (salary sacrifice)',neg(pen),'neg')+
     r('Extra salary sacrifice',neg(extra),'neg')+
@@ -662,7 +683,7 @@ document.querySelectorAll('input,select').forEach(e=>{
   e.addEventListener('input',onFieldInput);
   e.addEventListener('change',onFieldInput);
 });
-loadSettings();calc();
+loadSettings();syncBonusModeUi();calc();
 const THEME_KEY='take-home-theme';
 const THEME_CYCLE=['system','light','dark'];
 const THEME_LABEL={system:'Auto',light:'Light',dark:'Dark'};
