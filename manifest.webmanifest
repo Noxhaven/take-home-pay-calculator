@@ -1,7 +1,7 @@
 {
-  "name": "UK Shift Pay Calculator",
-  "short_name": "Shift Pay",
-  "description": "2026/27 UK shift-worker take-home pay estimate",
+  "name": "UK Take-Home Pay Calculator",
+  "short_name": "Take-Home",
+  "description": "2026/27 UK take-home pay estimate",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
