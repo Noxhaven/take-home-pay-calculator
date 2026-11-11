@@ -470,6 +470,18 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
 <div class="field"><label for="otrate">Overtime rate (£)</label><input id="otrate" type="number" step="0.01" inputmode="decimal"></div>
 <div class="field"><label for="hours">Standard hours (per period)</label><input id="hours" type="number" step="0.25" inputmode="decimal"></div>
 <div class="field"><label for="othours">Overtime hours (per period)</label><input id="othours" type="number" step="0.25" inputmode="decimal"></div>
+<div class="field"><label for="shiftAllow">Shift allowance (optional)</label>
+<div class="seg" id="shiftAllowMode">
+<button type="button" data-m="fixed" class="on">£</button>
+<button type="button" data-m="pct">%</button>
+</div>
+<input id="shiftAllow" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="supplement">Supplement (optional)</label>
+<div class="seg" id="supplementMode">
+<button type="button" data-m="hourly" class="on">£/h</button>
+<button type="button" data-m="fixed">£</button>
+</div>
+<input id="supplement" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
 <div class="field"><label for="pension">Pension contribution (%)</label><input id="pension" type="number" step="0.1" inputmode="decimal"></div>
 <div class="field"><label for="bonus">Bonus (optional)</label>
 <div class="seg" id="bonusMode">
@@ -529,9 +541,11 @@ const RATES={
 /* ─── end tax year block ─── */
 
 const STORE_KEY='take-home-settings-v2';
-const FIELD_IDS=['rate','otrate','hours','othours','pension','bonus','sac','code','sl'];
+const FIELD_IDS=['rate','otrate','hours','othours','shiftAllow','supplement','pension','bonus','sac','code','sl'];
 let period=null;
 let bonusMode='fixed';
+let shiftAllowMode='fixed';
+let supplementMode='hourly';
 const $=id=>document.getElementById(id);
 const num=id=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:0};
 const gbp=v=>'£'+v.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -541,7 +555,7 @@ $('tax-year-label').textContent=TAX_YEAR;
 document.title='UK Take-Home Pay Calculator '+TAX_YEAR;
 
 function saveSettings(){
-  const data={period:period||'',bonusMode};
+  const data={period:period||'',bonusMode,shiftAllowMode,supplementMode};
   FIELD_IDS.forEach(id=>{data[id]=$(id).value});
   try{localStorage.setItem(STORE_KEY,JSON.stringify(data))}catch(_){}
 }
@@ -559,12 +573,19 @@ function loadSettings(){
       document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===period));
     }
     if(data.bonusMode==='pct'||data.bonusMode==='fixed')bonusMode=data.bonusMode;
-    syncBonusModeUi();
+    if(data.shiftAllowMode==='pct'||data.shiftAllowMode==='fixed')shiftAllowMode=data.shiftAllowMode;
+    if(data.supplementMode==='hourly'||data.supplementMode==='fixed')supplementMode=data.supplementMode;
+    syncModeUi();
     FIELD_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).value=data[id]});
   }catch(_){}
 }
-function syncBonusModeUi(){
+function syncModeUi(){
   document.querySelectorAll('#bonusMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===bonusMode));
+  document.querySelectorAll('#shiftAllowMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===shiftAllowMode));
+  document.querySelectorAll('#supplementMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===supplementMode));
+}
+function bindModeSeg(id,apply){
+  document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{apply(b.dataset.m);syncModeUi();calc();saveSettings();});
 }
 function setPeriod(p){
   period=p;
@@ -572,9 +593,17 @@ function setPeriod(p){
   calc();saveSettings();
 }
 document.querySelectorAll('#period button').forEach(b=>b.onclick=()=>setPeriod(b.dataset.p));
-document.querySelectorAll('#bonusMode button').forEach(b=>b.onclick=()=>{
-  bonusMode=b.dataset.m;syncBonusModeUi();calc();saveSettings();
-});
+bindModeSeg('bonusMode',m=>{bonusMode=m});
+bindModeSeg('shiftAllowMode',m=>{shiftAllowMode=m});
+bindModeSeg('supplementMode',m=>{supplementMode=m});
+
+function optionalExtra(inputId,mode,pctBase,hourlyHours){
+  const v=num(inputId);
+  if(v<=0)return 0;
+  if(mode==='pct')return pctBase*(v/100);
+  if(mode==='hourly')return v*hourlyHours;
+  return v;
+}
 
 function parseTaxCode(raw,annualIncome){
   const code=String(raw||'').trim().toUpperCase().replace(/\s/g,'');
@@ -632,7 +661,12 @@ function calc(){
   }
 
   const freq=RATES.periodsPerYear[period];
-  const payBeforeBonus=num('hours')*num('rate')+num('othours')*num('otrate');
+  const basicPay=num('hours')*num('rate');
+  const otPay=num('othours')*num('otrate');
+  const totalHours=num('hours')+num('othours');
+  const shiftAllow=optionalExtra('shiftAllow',shiftAllowMode,basicPay,0);
+  const supplement=optionalExtra('supplement',supplementMode,0,totalHours);
+  const payBeforeBonus=basicPay+otPay+shiftAllow+supplement;
   const bonusIn=num('bonus');
   const bonus=bonusIn>0?(bonusMode==='pct'?payBeforeBonus*(bonusIn/100):bonusIn):0;
   const gross=payBeforeBonus+bonus;
@@ -664,6 +698,8 @@ function calc(){
   const r=(l,v,c='')=>`<tr class="${c}"><td>${l}</td><td>${v}</td></tr>`;
   const bonusRow=bonus>0?r('Bonus',gbp(bonus)): '';
   $('tbl').innerHTML=
+    (shiftAllow>0?r('Shift allowance',gbp(shiftAllow)):'')+
+    (supplement>0?r('Supplement',gbp(supplement)):'')+
     (bonus>0?r('Pay before bonus',gbp(payBeforeBonus)): '')+
     bonusRow+
     r('Gross pay',gbp(gross))+
@@ -683,7 +719,7 @@ document.querySelectorAll('input,select').forEach(e=>{
   e.addEventListener('input',onFieldInput);
   e.addEventListener('change',onFieldInput);
 });
-loadSettings();syncBonusModeUi();calc();
+loadSettings();syncModeUi();calc();
 const THEME_KEY='take-home-theme';
 const THEME_CYCLE=['system','light','dark'];
 const THEME_LABEL={system:'Auto',light:'Light',dark:'Dark'};
