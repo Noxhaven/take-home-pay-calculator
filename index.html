@@ -321,7 +321,6 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
   .big{padding:2px 0}
   .install,.theme-toggle{min-height:40px;padding:8px 12px}
 }
-/* Foldables: cover / narrow outer display */
 @media (spanning:single-fold-vertical),(max-width:400px){
   .grid{grid-template-columns:1fr}
 }
@@ -333,7 +332,6 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
     padding-bottom:max(28px,var(--sab),var(--fold-bottom),calc(var(--fold-h)*.25));
   }
 }
-/* Foldables: side-by-side panes — keep UI in one pane, clear of hinge */
 @media (spanning:single-fold-horizontal){
   .grid{grid-template-columns:1fr}
   .wrap{
@@ -367,19 +365,16 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
 @media (spanning:single-fold-horizontal) and (min-width:700px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-/* Flex / half-fold landscape on narrow height */
 @media (spanning:single-fold-horizontal) and (orientation:landscape) and (max-height:520px){
   .glass{padding:12px 14px;margin-bottom:10px}
   .big .v{font-size:clamp(1.5rem,4vw + 1rem,2rem)}
 }
-/* Unfolded tablet-wide — same look, roomier measure */
 @media (spanning:none) and (min-width:600px) and (max-width:1100px){
   .wrap{--content-w:min(100%,720px)}
 }
 @media (min-aspect-ratio:4/3) and (max-width:900px){
   .blob{opacity:.34}
 }
-/* Sharper density on roomier viewports — not on narrow / closed fold */
 @media (min-width:421px) and (not (spanning:single-fold-vertical)){
   p.sub{margin-bottom:12px}
   .glass{

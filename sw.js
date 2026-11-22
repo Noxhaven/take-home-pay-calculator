@@ -1,4 +1,4 @@
-const CACHE = 'take-home-v11';
+const CACHE = 'take-home-v12';
 const ASSETS = [
   './',
   './index.html',
