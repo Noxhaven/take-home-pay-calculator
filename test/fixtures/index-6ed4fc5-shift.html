@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#32363e" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" id="meta-theme" content="#32363e">
+<script>try{var t=localStorage.getItem('take-home-theme');document.documentElement.setAttribute('data-theme',t==='light'||t==='dark'?t:'system')}catch(e){document.documentElement.setAttribute('data-theme','system')}</script>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Take-Home">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<title>UK Take-Home Pay Calculator</title>
+<style>
+:root{
+  --sat:env(safe-area-inset-top,0px);
+  --sar:env(safe-area-inset-right,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);
+  --fold-top:env(fold-top,0px);
+  --fold-bottom:env(fold-bottom,0px);
+  --fold-left:env(fold-left,0px);
+  --fold-right:env(fold-right,0px);
+  --fold-w:env(fold-width,0px);
+  --fold-h:env(fold-height,0px);
+  --page-pad:max(16px,12px);
+  --content-w:min(100%,780px);
+  color-scheme:dark;
+  --bg-body:#32363e;
+  --scene-bg:
+    radial-gradient(ellipse 78% 62% at 50% 42%, rgba(120,112,100,.14) 0%, transparent 62%),
+    radial-gradient(1000px 680px at 14% -6%, rgba(90,84,78,.22) 0%, transparent 56%),
+    radial-gradient(880px 600px at 88% 10%, rgba(85,82,76,.18) 0%, transparent 54%),
+    radial-gradient(760px 620px at 56% 108%, rgba(78,76,72,.16) 0%, transparent 58%),
+    radial-gradient(ellipse 115% 95% at 50% 50%, transparent 32%, rgba(20,18,16,.55) 78%, rgba(14,13,12,.75) 100%),
+    linear-gradient(180deg,#3a3e46 0%,#32363e 48%,#2e3238 100%);
+  --blob-a:#6a6660;--blob-b:#5e5c58;--blob-c:#585650;
+  --blob-opacity:.32;--blob-blend:screen;--grain-opacity:.09;
+  --card-bg:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03) 45%,rgba(255,255,255,.02)),#454950;
+  --card-shine:rgba(255,255,255,.18);--card-rim:rgba(255,255,255,.75);
+  --glass-fallback:#454950;
+  --stroke:rgba(255,255,255,.22);
+  --card-shadow:0 1px 0 rgba(255,255,255,.38) inset,0 -14px 32px rgba(0,0,0,.12) inset,0 14px 36px rgba(0,0,0,.22);
+  --ink:#f2f0ec;--muted:rgba(242,240,236,.62);--label:rgba(242,240,236,.76);
+  --hero-top:#f4f1ea;--hero-bot:#c9ab6e;--hero-glow:rgba(201,171,110,.22);
+  --red:#e89088;--warn-text:#e8b4a8;--link:#a8c0e0;
+  --input-bg:rgba(0,0,0,.16);--input-border:rgba(255,255,255,.16);
+  --input-inset:0 1px 0 rgba(255,255,255,.12) inset,0 4px 12px rgba(0,0,0,.12) inset;
+  --focus-border:rgba(255,255,255,.5);--focus-ring:rgba(201,171,110,.22);
+  --seg-bg:rgba(0,0,0,.14);--seg-border:rgba(255,255,255,.1);
+  --seg-btn:rgba(255,255,255,.78);
+  --seg-on-bg:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.06));
+  --seg-on-border:rgba(255,255,255,.26);--seg-on-ink:#fff;--seg-on-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 14px rgba(0,0,0,.15);
+  --table-line:rgba(255,255,255,.09);--tot-line:rgba(255,255,255,.22);
+  --chip-bg:rgba(0,0,0,.18);--chip-border:rgba(255,255,255,.22);--chip-inset:0 1px 0 rgba(255,255,255,.14) inset;
+  --tip-bg:rgba(0,0,0,.18);--tip-border:rgba(255,255,255,.1);--note:rgba(242,240,236,.55);
+  --select-chevron:#f2f0ec;
+}
+@media (prefers-color-scheme:light){
+  :root[data-theme="system"]{
+    --bg-body:#f6f3ec;
+    --scene-bg:
+      radial-gradient(ellipse 82% 68% at 50% 38%, rgba(205,220,198,.55) 0%, transparent 62%),
+      radial-gradient(960px 640px at 12% -4%, rgba(230,218,195,.4) 0%, transparent 56%),
+      radial-gradient(820px 560px at 90% 8%, rgba(198,212,192,.35) 0%, transparent 54%),
+      radial-gradient(720px 580px at 50% 100%, rgba(186,202,178,.28) 0%, transparent 58%),
+      radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(220,210,195,.35) 100%),
+      linear-gradient(180deg,#faf7f1 0%,#f6f3ec 50%,#efebe3 100%);
+    --blob-a:#c5d4c0;--blob-b:#ddd0b8;--blob-c:#b8c9b4;
+    --blob-opacity:.38;--blob-blend:multiply;--grain-opacity:.07;
+    --card-bg:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.2) 42%,rgba(248,252,247,.9)),#dfe8df;
+    --card-shine:rgba(255,255,255,.85);--card-rim:rgba(255,255,255,.95);
+    --glass-fallback:#dfe8df;
+    --stroke:rgba(72,88,72,.22);
+    --card-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 -10px 24px rgba(120,140,110,.08) inset,0 10px 28px rgba(80,70,50,.08);
+    --ink:#2c2e30;--muted:rgba(44,46,48,.62);--label:rgba(44,46,48,.78);
+    --hero-top:#4a4438;--hero-bot:#b8954a;--hero-glow:rgba(184,149,74,.2);
+    --red:#c45c54;--warn-text:#b85a50;--link:#3d6a9e;
+    --input-bg:rgba(255,255,255,.72);--input-border:rgba(72,88,72,.18);
+    --input-inset:0 1px 0 rgba(255,255,255,.95) inset,0 2px 8px rgba(80,70,50,.06) inset;
+    --focus-border:rgba(184,149,74,.55);--focus-ring:rgba(184,149,74,.2);
+    --seg-bg:rgba(255,255,255,.45);--seg-border:rgba(72,88,72,.14);
+    --seg-btn:rgba(44,46,48,.72);
+    --seg-on-bg:linear-gradient(180deg,rgba(210,180,110,.38),rgba(196,163,90,.18));
+    --seg-on-border:rgba(184,149,74,.48);--seg-on-ink:#3d3428;
+    --seg-on-shadow:0 1px 0 rgba(255,255,255,.65) inset,0 3px 10px rgba(184,149,74,.15);
+    --table-line:rgba(44,46,48,.1);--tot-line:rgba(44,46,48,.2);
+    --chip-bg:rgba(255,255,255,.55);--chip-border:rgba(72,88,72,.18);--chip-inset:0 1px 0 rgba(255,255,255,.85) inset;
+    --tip-bg:rgba(255,255,255,.5);--tip-border:rgba(72,88,72,.12);--note:rgba(44,46,48,.55);
+    --select-chevron:#2c2e30;
+  }
+}
+:root[data-theme="light"]{
+  --bg-body:#f6f3ec;
+  --scene-bg:
+    radial-gradient(ellipse 82% 68% at 50% 38%, rgba(205,220,198,.55) 0%, transparent 62%),
+    radial-gradient(960px 640px at 12% -4%, rgba(230,218,195,.4) 0%, transparent 56%),
+    radial-gradient(820px 560px at 90% 8%, rgba(198,212,192,.35) 0%, transparent 54%),
+    radial-gradient(720px 580px at 50% 100%, rgba(186,202,178,.28) 0%, transparent 58%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(220,210,195,.35) 100%),
+    linear-gradient(180deg,#faf7f1 0%,#f6f3ec 50%,#efebe3 100%);
+  --blob-a:#c5d4c0;--blob-b:#ddd0b8;--blob-c:#b8c9b4;
+  --blob-opacity:.38;--blob-blend:multiply;--grain-opacity:.07;
+  --card-bg:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.2) 42%,rgba(248,252,247,.9)),#dfe8df;
+  --card-shine:rgba(255,255,255,.85);--card-rim:rgba(255,255,255,.95);
+  --glass-fallback:#dfe8df;
+  --stroke:rgba(72,88,72,.22);
+  --card-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 -10px 24px rgba(120,140,110,.08) inset,0 10px 28px rgba(80,70,50,.08);
+  --ink:#2c2e30;--muted:rgba(44,46,48,.62);--label:rgba(44,46,48,.78);
+  --hero-top:#4a4438;--hero-bot:#b8954a;--hero-glow:rgba(184,149,74,.2);
+  --red:#c45c54;--warn-text:#b85a50;--link:#3d6a9e;
+  --input-bg:rgba(255,255,255,.72);--input-border:rgba(72,88,72,.18);
+  --input-inset:0 1px 0 rgba(255,255,255,.95) inset,0 2px 8px rgba(80,70,50,.06) inset;
+  --focus-border:rgba(184,149,74,.55);--focus-ring:rgba(184,149,74,.2);
+  --seg-bg:rgba(255,255,255,.45);--seg-border:rgba(72,88,72,.14);
+  --seg-btn:rgba(44,46,48,.72);
+  --seg-on-bg:linear-gradient(180deg,rgba(210,180,110,.38),rgba(196,163,90,.18));
+  --seg-on-border:rgba(184,149,74,.48);--seg-on-ink:#3d3428;
+  --seg-on-shadow:0 1px 0 rgba(255,255,255,.65) inset,0 3px 10px rgba(184,149,74,.15);
+  --table-line:rgba(44,46,48,.1);--tot-line:rgba(44,46,48,.2);
+  --chip-bg:rgba(255,255,255,.55);--chip-border:rgba(72,88,72,.18);--chip-inset:0 1px 0 rgba(255,255,255,.85) inset;
+  --tip-bg:rgba(255,255,255,.5);--tip-border:rgba(72,88,72,.12);--note:rgba(44,46,48,.55);
+  --select-chevron:#2c2e30;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{color-scheme:dark}
+@media (prefers-color-scheme:light){:root[data-theme="system"]{color-scheme:light}}
+@media (prefers-color-scheme:dark){:root[data-theme="system"]{color-scheme:dark}}
+*{box-sizing:border-box}
+html{
+  margin:0;
+  height:100%;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  overflow-x:hidden;
+}
+body{
+  margin:0;
+  min-height:100%;
+  min-height:100dvh;
+  min-height:-webkit-fill-available;
+  font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;
+  color:var(--ink);
+  background:var(--bg-body);
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  overscroll-behavior-y:none;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.scene{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--scene-bg)}
+.blob{
+  position:absolute;filter:blur(48px);opacity:var(--blob-opacity);border-radius:50%;
+  mix-blend-mode:var(--blob-blend);animation:drift 22s ease-in-out infinite;
+}
+@media (prefers-reduced-motion:reduce){
+  .blob{animation:none}
+}
+.blob.a{width:42vw;height:42vw;left:-8%;top:-12%;background:var(--blob-a);animation-duration:26s}
+.blob.b{width:36vw;height:36vw;right:-10%;top:8%;background:var(--blob-b);animation-duration:31s;animation-delay:-8s}
+.blob.c{width:48vw;height:48vw;left:22%;bottom:-28%;background:var(--blob-c);animation-duration:28s;animation-delay:-14s}
+@keyframes drift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(4%,6%) scale(1.08)}
+  66%{transform:translate(-5%,-3%) scale(.94)}
+}
+.grain{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--grain-opacity);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.42'/></svg>");
+  background-size:180px 180px;
+}
+.wrap{
+  position:relative;z-index:2;
+  width:var(--content-w);
+  max-width:100%;
+  margin-inline:auto;
+  padding:
+    max(12px,var(--sat),var(--fold-top))
+    max(var(--page-pad),var(--sar),var(--fold-right))
+    max(28px,var(--sab),var(--fold-bottom))
+    max(var(--page-pad),var(--sal),var(--fold-left));
+}
+.hdr{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 12px;margin-bottom:2px}
+.hdr-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;justify-content:flex-end}
+.hdr-text{flex:1 1 12rem;min-width:0}
+h1{font-size:clamp(1.15rem,4.2vw + .4rem,1.55rem);letter-spacing:-.03em;margin:6px 0 4px;font-weight:700;line-height:1.2}
+p.sub{margin:0 0 14px;color:var(--muted);font-size:clamp(.82rem,2.5vw,.92rem);line-height:1.35}
+.install,.theme-toggle{
+  flex:0 0 auto;align-self:flex-start;
+  font:inherit;font-size:.78rem;font-weight:600;
+  color:var(--ink);cursor:pointer;
+  padding:10px 14px;min-height:44px;
+  border-radius:14px;border:1px solid var(--chip-border);
+  background:var(--chip-bg);
+  box-shadow:var(--chip-inset);
+}
+.install[hidden]{display:none!important}
+.install-tip{
+  font-size:.76rem;color:var(--note);line-height:1.4;
+  margin:-6px 0 14px;padding:10px 12px;border-radius:12px;
+  border:1px solid var(--tip-border);background:var(--tip-bg);
+}
+.install-tip[hidden]{display:none}
+.code-warn{font-size:.76rem;color:var(--warn-text);margin-top:6px;line-height:1.4;display:none}
+.code-warn.show{display:block}
+.code-warn a{color:var(--link)}
+.glass{
+  position:relative;
+  background:var(--card-bg);
+  border:1px solid var(--stroke);
+  border-radius:28px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:var(--card-shadow);
+  backdrop-filter:blur(34px) saturate(160%);
+  -webkit-backdrop-filter:blur(34px) saturate(160%);
+  overflow:hidden;
+}
+.glass::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(120% 90px at 50% -10%,var(--card-shine),transparent 70%);
+}
+.glass::after{
+  content:"";position:absolute;left:8%;right:8%;top:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--card-rim),transparent);
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(10px,2.5vw,14px);
+  margin-top:12px;
+}
+@media (min-width:520px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (spanning:none) and (min-width:520px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (spanning:none) and (min-width:900px){
+  :root{--content-w:min(100%,840px)}
+}
+label{display:block;font-size:.78rem;font-weight:650;color:var(--label);margin-bottom:6px;letter-spacing:.01em}
+.field{min-width:0}
+input,select{
+  display:block;width:100%;max-width:100%;
+  padding:12px;border-radius:14px;font-size:16px;color:var(--ink);
+  background:var(--input-bg);
+  border:1px solid var(--input-border);
+  box-shadow:var(--input-inset);
+  outline:none;appearance:none;-webkit-appearance:none;min-height:48px;
+}
+select{
+  background-image:linear-gradient(45deg,transparent 50%,var(--select-chevron) 50%),linear-gradient(135deg,var(--select-chevron) 50%,transparent 50%);
+  background-position:calc(100% - 16px) 54%,calc(100% - 11px) 54%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+input:focus,select:focus{
+  border-color:var(--focus-border);
+  box-shadow:0 0 0 4px var(--focus-ring),var(--input-inset);
+}
+.seg{display:flex;gap:6px;padding:5px;border-radius:16px;background:var(--seg-bg);border:1px solid var(--seg-border)}
+.seg button{
+  flex:1;padding:10px 8px;border:0;border-radius:12px;background:transparent;
+  font-size:.95rem;color:var(--seg-btn);cursor:pointer;min-height:44px;
+}
+.seg button.on{
+  color:var(--seg-on-ink);font-weight:650;
+  background:var(--seg-on-bg);
+  border:1px solid var(--seg-on-border);
+  box-shadow:var(--seg-on-shadow);
+  backdrop-filter:blur(12px);
+}
+.big{text-align:center;padding:6px 0 8px;position:relative;z-index:1}
+.big .v{
+  font-size:clamp(1.75rem,7vw + .5rem,2.45rem);font-weight:750;letter-spacing:-.04em;
+  background:linear-gradient(180deg,var(--hero-top) 10%,var(--hero-bot));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 3px 8px var(--hero-glow));
+  overflow-wrap:anywhere;
+}
+.big .l{color:var(--muted);font-size:clamp(.85rem,2.5vw,.92rem);margin-top:2px}
+.tbl-wrap{position:relative;z-index:1;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
+table{width:100%;min-width:min(100%,280px);border-collapse:collapse;font-size:clamp(.84rem,2.2vw,.95rem);table-layout:fixed}
+td{padding:10px 4px;border-bottom:1px solid var(--table-line);vertical-align:top}
+td:first-child{width:58%;padding-right:10px;word-wrap:break-word;overflow-wrap:anywhere}
+td:last-child{width:42%;text-align:right;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;font-weight:550;white-space:nowrap}
+tr.neg td:last-child{color:var(--red)}
+tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;padding-top:14px}
+.note{font-size:clamp(.74rem,2.2vw,.8rem);color:var(--note);line-height:1.45;margin:4px 0 0;max-width:70ch}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .glass{background:var(--glass-fallback)}
+}
+@media (max-width:380px){
+  .glass{border-radius:20px;padding:14px}
+  .seg{gap:4px;padding:4px}
+  .seg button{font-size:.86rem;padding:8px 4px}
+}
+@media (max-width:640px){
+  .blob.a,.blob.b,.blob.c{width:min(78vw,420px);height:min(78vw,420px)}
+}
+@media (min-width:768px){
+  :root{--page-pad:20px}
+  .wrap{padding-top:max(18px,var(--sat))}
+}
+@media (min-width:1024px){
+  .wrap{padding-bottom:max(40px,var(--sab))}
+}
+@media (orientation:landscape) and (max-height:520px){
+  .wrap{padding-top:max(8px,var(--sat));padding-bottom:max(12px,var(--sab))}
+  .glass{padding:12px 14px;margin-bottom:10px;border-radius:18px}
+  h1{margin:2px 0;font-size:1.1rem}
+  p.sub{margin-bottom:8px}
+  .big{padding:2px 0}
+  .install,.theme-toggle{min-height:40px;padding:8px 12px}
+}
+/* Foldables: cover / narrow outer display */
+@media (spanning:single-fold-vertical),(max-width:400px){
+  .grid{grid-template-columns:1fr}
+}
+@media (spanning:single-fold-vertical){
+  .wrap{
+    width:min(100%,680px);
+    max-width:calc(100vw - var(--sal) - var(--sar) - var(--fold-left) - var(--fold-right));
+    padding-top:max(12px,var(--sat),var(--fold-top),calc(var(--fold-h)*.25));
+    padding-bottom:max(28px,var(--sab),var(--fold-bottom),calc(var(--fold-h)*.25));
+  }
+}
+/* Foldables: side-by-side panes — keep UI in one pane, clear of hinge */
+@media (spanning:single-fold-horizontal){
+  .grid{grid-template-columns:1fr}
+  .wrap{
+    width:100%;
+    max-width:min(780px,calc(50vw - var(--fold-w)*.5 - var(--sal) - var(--sar) - 20px));
+    margin-inline-start:max(var(--sal),var(--fold-left),var(--page-pad));
+    margin-inline-end:auto;
+    padding-inline:
+      max(var(--page-pad),var(--sal),var(--fold-left))
+      max(var(--page-pad),var(--sar),var(--fold-right));
+  }
+}
+@supports (horizontal-viewport-segments:2){
+  @media (spanning:single-fold-horizontal){
+    .wrap{
+      width:min(100%,env(viewport-segment-width 0 0,50vw));
+      max-width:min(780px,env(viewport-segment-width 0 0,50vw));
+      margin-inline-start:max(env(viewport-segment-left 0 0,0px),var(--sal),var(--fold-left));
+      margin-inline-end:auto;
+    }
+  }
+}
+@supports (vertical-viewport-segments:2){
+  @media (spanning:single-fold-vertical){
+    .wrap{
+      max-width:min(780px,env(viewport-segment-width 0 0,100vw));
+      margin-block-start:max(env(viewport-segment-top 0 0,0px),var(--sat),var(--fold-top));
+    }
+  }
+}
+@media (spanning:single-fold-horizontal) and (min-width:700px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Flex / half-fold landscape on narrow height */
+@media (spanning:single-fold-horizontal) and (orientation:landscape) and (max-height:520px){
+  .glass{padding:12px 14px;margin-bottom:10px}
+  .big .v{font-size:clamp(1.5rem,4vw + 1rem,2rem)}
+}
+/* Unfolded tablet-wide — same look, roomier measure */
+@media (spanning:none) and (min-width:600px) and (max-width:1100px){
+  .wrap{--content-w:min(100%,720px)}
+}
+@media (min-aspect-ratio:4/3) and (max-width:900px){
+  .blob{opacity:.34}
+}
+/* Sharper density on roomier viewports — not on narrow / closed fold */
+@media (min-width:421px) and (not (spanning:single-fold-vertical)){
+  p.sub{margin-bottom:12px}
+  .glass{
+    padding:16px;
+    margin-bottom:14px;
+    border-radius:24px;
+  }
+  .grid{gap:clamp(8px,1.8vw,12px);margin-top:10px}
+  label{margin-bottom:5px}
+  .big{padding:4px 0 6px}
+  td{padding:8px 4px}
+  tr.tot td{padding-top:11px}
+  .note{line-height:1.4}
+}
+@media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
+  body{text-rendering:geometricPrecision}
+  .glass,input,select,.seg,.install,.theme-toggle{
+    border-color:color-mix(in srgb,var(--stroke) 92%,#fff);
+  }
+  table{font-feature-settings:"tnum" 1,"lnum" 1}
+}
+@media (max-width:420px),(spanning:single-fold-vertical){
+  .grid{gap:clamp(10px,2.5vw,14px)}
+  .glass{padding:18px;margin-bottom:16px}
+  input,select{min-height:48px;padding:12px}
+}
+.main-cols{display:flex;flex-direction:column;gap:16px}
+@media (min-width:700px){
+  .main-cols{
+    display:grid;
+    grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);
+    gap:12px 14px;
+    align-items:start;
+  }
+  .main-cols .glass{margin-bottom:0}
+  .panel-results{
+    position:sticky;
+    top:max(8px,var(--sat),var(--fold-top));
+  }
+  .panel-inputs .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+  .panel-results .big{padding:2px 0 4px}
+  .panel-results td{padding:7px 4px}
+  .panel-results tr.tot td{padding-top:9px}
+}
+@media (min-width:700px) and (max-height:780px){
+  .main-cols{gap:10px 12px}
+  .main-cols .glass{padding:14px 15px;border-radius:22px}
+  .panel-inputs .grid{gap:8px;margin-top:8px}
+  .panel-inputs label{margin-bottom:4px}
+  .panel-inputs input,.panel-inputs select{min-height:46px;padding:10px 12px}
+  .panel-results .big{padding:0 0 2px}
+  .panel-results td{padding:6px 3px}
+  .hdr{margin-bottom:0}
+  p.sub{margin-bottom:10px}
+  .note{margin-top:10px}
+}
+@media (max-width:699px){
+  .main-cols .glass{margin-bottom:16px}
+  .main-cols .glass:last-child{margin-bottom:0}
+}
+.chk-row{display:flex;align-items:flex-start;gap:10px;margin-top:2px}
+.chk-row input[type=checkbox]{width:20px;height:20px;min-height:20px;margin:2px 0 0;padding:0;flex:0 0 auto;accent-color:var(--hero-bot)}
+.chk-row label{margin:0;font-weight:600;cursor:pointer;flex:1}
+.field-span{grid-column:1/-1}
+.sect{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:8px 0 2px}
+.hint{font-size:.72rem;color:var(--note);font-weight:500;margin-top:4px;line-height:1.35}
+.reset-btn{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="scene" aria-hidden="true"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="wrap">
+<header class="hdr">
+<div class="hdr-text">
+<h1>UK Shift Pay Calculator</h1>
+<p class="sub" id="region-label"><strong id="tax-year-label">2026/27</strong> · shift &amp; overtime pay estimate</p>
+</div>
+<div class="hdr-actions">
+<button type="button" class="theme-toggle reset-btn" id="reset" aria-label="Reset all inputs">Reset</button>
+<button type="button" class="theme-toggle" id="theme" aria-label="Theme: system">Auto</button>
+<button type="button" class="install" id="install" hidden>Add to home screen</button>
+</div>
+</header>
+<p class="install-tip" id="install-tip" hidden></p>
+<div class="main-cols">
+<div class="card glass panel-inputs" id="panel-inputs">
+<label>Period</label>
+<div class="seg" id="period">
+<button type="button" data-p="weekly">Weekly</button>
+<button type="button" data-p="monthly" class="on">Monthly</button>
+<button type="button" data-p="annual">Annual</button>
+</div>
+<div class="grid">
+<p class="sect field-span">Contract &amp; shifts (per month)</p>
+<div class="field"><label for="baseRate">Base hourly rate (£)</label><input id="baseRate" type="number" step="0.01" inputmode="decimal" placeholder="e.g. 15.00"></div>
+<div class="field"><label for="supplementRate">Hourly supplement (£, optional)</label><input id="supplementRate" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="weeklyHours">Contracted hours / week</label><input id="weeklyHours" type="number" step="0.25" inputmode="decimal" value="40"></div>
+<div class="field"><label for="weeksPerMonth">Weeks per month</label><input id="weeksPerMonth" type="number" step="0.01" inputmode="decimal" value="4.35"></div>
+<div class="field"><label for="shiftLength">Shift length (hours)</label><input id="shiftLength" type="number" step="0.25" inputmode="decimal" value="12"></div>
+<div class="field"><label for="unpaidBreak">Unpaid break (hours)</label><input id="unpaidBreak" type="number" step="0.05" inputmode="decimal" value="0.75"></div>
+<div class="field"><label for="shifts">Shifts this month</label><input id="shifts" type="number" step="1" inputmode="numeric" placeholder="—"></div>
+<div class="field"><label for="shiftAllowPct">Shift allowance (% of basic)</label><input id="shiftAllowPct" type="number" step="0.1" inputmode="decimal" placeholder="e.g. 6"></div>
+<div class="field field-span chk-row"><input type="checkbox" id="allowanceIncSupp"><label for="allowanceIncSupp">Include supplement in shift-allowance base</label></div>
+
+<p class="sect field-span">Overtime &amp; time bank</p>
+<div class="field"><label for="otHours">Overtime hours (this month)</label><input id="otHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="otMult">Overtime multiplier</label><input id="otMult" type="number" step="0.05" inputmode="decimal" value="1.5"></div>
+<div class="field"><label for="otBankCap">Time-bank cap (hours / month)</label><input id="otBankCap" type="number" step="1" inputmode="numeric" placeholder="e.g. 24"><p class="hint">First N hrs: only the premium is paid; base goes to time bank</p></div>
+<div class="field field-span"><label for="otExcess">Overtime above cap</label>
+<select id="otExcess">
+<option value="full_next">Paid in full this month</option>
+<option value="hold_second">Held in second time account (not paid)</option>
+<option value="threshold">Paid only when second account reaches threshold</option>
+</select></div>
+<div class="field ot-threshold" hidden><label for="secondBankHrs">Second account balance (hours)</label><input id="secondBankHrs" type="number" step="0.25" inputmode="decimal" value="0"></div>
+<div class="field ot-threshold" hidden><label for="secondThreshold">Payout threshold (hours)</label><input id="secondThreshold" type="number" step="1" inputmode="numeric" placeholder="e.g. 40"></div>
+
+<p class="sect field-span">Premium hours</p>
+<div class="field"><label for="premHours">Premium hours (e.g. nights / BH)</label><input id="premHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="premPct">Premium (% of hourly base)</label><input id="premPct" type="number" step="1" inputmode="decimal" value="50"></div>
+<div class="field"><label for="premBase">Premium calculated on</label>
+<select id="premBase">
+<option value="base">Base rate only</option>
+<option value="blended">Base + supplement</option>
+</select></div>
+<div class="field"><label for="overlapHrs">Overlap hrs (premium wins)</label><input id="overlapHrs" type="number" step="0.25" inputmode="decimal" placeholder="0"><p class="hint">Hours that earn premium, not OT premium</p></div>
+
+<p class="sect field-span">Arrears &amp; bonus</p>
+<div class="field field-span chk-row"><input type="checkbox" id="arrears"><label for="arrears">Variable pay one month in arrears (basic now; supplement, allowance, OT &amp; premiums last month)</label></div>
+<div class="field arrears-only" hidden><label for="prevShifts">Last month: shifts</label><input id="prevShifts" type="number" step="1" inputmode="numeric" placeholder="0"></div>
+<div class="field arrears-only" hidden><label for="prevOtHours">Last month: OT hours</label><input id="prevOtHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field arrears-only" hidden><label for="prevPremHours">Last month: premium hours</label><input id="prevPremHours" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field arrears-only" hidden><label for="prevOverlap">Last month: overlap hours</label><input id="prevOverlap" type="number" step="0.25" inputmode="decimal" placeholder="0"></div>
+<div class="field"><label for="bonus">Bonus (£ this month)</label><input id="bonus" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
+
+<p class="sect field-span">Tax, NI &amp; student loan</p>
+<div class="field"><label for="region">Income tax region</label>
+<select id="region">
+<option value="ewni">England, Wales &amp; NI</option>
+<option value="scot">Scotland</option>
+</select></div>
+<div class="field"><label for="code">Tax code</label><input id="code" type="text" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="1257L">
+<p class="code-warn" id="code-warn">This tax code wasn’t recognised — allowance treated as £0. Check yours on <a href="https://www.gov.uk/tax-codes" target="_blank" rel="noopener noreferrer">GOV.UK tax codes</a>.</p></div>
+<div class="field"><label for="sl">Student loan</label>
+<select id="sl">
+<option value="none">None</option>
+<option value="p1">Plan 1</option>
+<option value="p2">Plan 2</option>
+<option value="p4">Plan 4</option>
+<option value="p5">Plan 5</option>
+<option value="pg">Postgraduate</option>
+</select></div>
+
+<p class="sect field-span">Pension</p>
+<div class="field"><label for="penMode">Method</label>
+<select id="penMode">
+<option value="ras">Relief at source (after tax &amp; NI; HMRC +20%)</option>
+<option value="netpay">Net pay arrangement (before tax)</option>
+<option value="sacrifice">Salary sacrifice (before tax &amp; NI)</option>
+</select></div>
+<div class="field"><label for="pension">Employee % (of pensionable)</label><input id="pension" type="number" step="0.1" inputmode="decimal" placeholder="e.g. 5"></div>
+<div class="field"><label for="pensionEr">Employer % (info only)</label><input id="pensionEr" type="number" step="0.1" inputmode="decimal" placeholder="—"></div>
+<div class="field field-span chk-row"><input type="checkbox" id="penExclOt" checked><label for="penExclOt">Exclude overtime premium from pensionable pay</label></div>
+<div class="field field-span chk-row"><input type="checkbox" id="penExclSupp" checked><label for="penExclSupp">Exclude supplement from pensionable pay</label></div>
+<div class="field field-span chk-row"><input type="checkbox" id="penExclPrem" checked><label for="penExclPrem">Exclude premium hours pay from pensionable pay</label></div>
+</div>
+</div>
+<div class="card glass panel-results">
+<div class="big"><div class="v" id="net">—</div><div class="l" id="netl">Choose Weekly, Monthly or Annual</div></div>
+<div class="tbl-wrap"><table id="tbl" aria-live="polite"></table></div>
+</div>
+</div>
+<p class="note">Estimate only — enter your own figures. Inputs stay on this device (local storage). Income tax is annualised then split; NI uses period thresholds (category A). Time-bank and arrears rules are simplified. Not for benefits in kind, exact payroll timing, or every scheme rule. Your payslip may differ.</p>
+</div>
+<script>
+/* ─── Tax year constants — update each April ─── */
+const TAX_YEAR='2026/27';
+const RATES={
+  personalAllowance:12570,
+  taperFrom:100000,
+  basicRateCeiling:50270,
+  additionalRateFrom:125140,
+  basicRate:0.20,
+  higherRate:0.40,
+  additionalRate:0.45,
+  scotlandBands:[
+    {up:2306,rate:0.19},
+    {up:13990,rate:0.20},
+    {up:31092,rate:0.21},
+    {up:62430,rate:0.42},
+    {up:Infinity,rate:0.48}
+  ],
+  periodsPerYear:{weekly:52,monthly:12,annual:1},
+  periodLabel:{weekly:'week',monthly:'month',annual:'year'},
+  ni:{
+    weekly:{pt:242,uel:967,main:0.08,upper:0.02},
+    monthly:{pt:1048,uel:4189,main:0.08,upper:0.02},
+    annual:{pt:12570,uel:50270,main:0.08,upper:0.02}
+  },
+  studentLoan:{
+    none:null,
+    p1:{threshold:26900,rate:0.09},
+    p2:{threshold:29385,rate:0.09},
+    p4:{threshold:33795,rate:0.09},
+    p5:{threshold:25000,rate:0.09},
+    pg:{threshold:21000,rate:0.06}
+  }
+};
+/* ─── end tax year block ─── */
+
+const STORE_KEY='take-home-settings-v3-shift';
+const FIELD_IDS=['baseRate','supplementRate','weeklyHours','weeksPerMonth','shiftLength','unpaidBreak','shifts','shiftAllowPct','otHours','otMult','otBankCap','secondBankHrs','secondThreshold','premHours','premPct','overlapHrs','prevShifts','prevOtHours','prevPremHours','prevOverlap','bonus','code','pension','pensionEr','sl'];
+const SELECT_IDS=['otExcess','premBase','region','penMode'];
+const BOOL_IDS=['allowanceIncSupp','arrears','penExclOt','penExclSupp','penExclPrem'];
+let period='monthly';
+const $=id=>document.getElementById(id);
+const num=id=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:0};
+const chk=id=>!!$(id)?.checked;
+const gbp=v=>'£'+v.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const neg=v=>v>0?'−'+gbp(v):gbp(0);
+
+$('tax-year-label').textContent=TAX_YEAR;
+document.title='UK Shift Pay Calculator '+TAX_YEAR;
+
+function updateRegionLabel(){
+  const sc=$('region').value==='scot';
+  $('region-label').innerHTML='<strong id="tax-year-label">'+TAX_YEAR+'</strong> · '+(sc?'Scottish income tax':'England, Wales &amp; NI');
+  $('tax-year-label').textContent=TAX_YEAR;
+}
+
+function saveSettings(){
+  const data={period};
+  FIELD_IDS.forEach(id=>{data[id]=$(id).value});
+  SELECT_IDS.forEach(id=>{data[id]=$(id).value});
+  BOOL_IDS.forEach(id=>{data[id]=chk(id)});
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(data))}catch(_){}
+}
+function loadSettings(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(!raw)return;
+    const data=JSON.parse(raw);
+    if(data.period&&RATES.periodsPerYear[data.period])period=data.period;
+    FIELD_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).value=data[id]});
+    SELECT_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).value=data[id]});
+    BOOL_IDS.forEach(id=>{if(data[id]!=null&&$(id))$(id).checked=!!data[id]});
+  }catch(_){}
+}
+function syncUi(){
+  document.querySelectorAll('#period button').forEach(b=>b.classList.toggle('on',b.dataset.p===period));
+  document.querySelectorAll('.arrears-only').forEach(el=>{el.hidden=!chk('arrears')});
+  const thresh=$('otExcess').value==='threshold';
+  document.querySelectorAll('.ot-threshold').forEach(el=>{el.hidden=!thresh});
+  updateRegionLabel();
+}
+function setPeriod(p){
+  period=p;syncUi();calc();saveSettings();
+}
+document.querySelectorAll('#period button').forEach(b=>b.onclick=()=>setPeriod(b.dataset.p));
+$('otExcess').addEventListener('change',()=>{syncUi();calc();saveSettings()});
+$('region').addEventListener('change',()=>{syncUi();calc();saveSettings()});
+['arrears'].forEach(id=>$(id).addEventListener('change',()=>{syncUi();calc();saveSettings()}));
+$('reset').onclick=()=>{
+  if(!confirm('Clear all inputs saved on this device?'))return;
+  try{localStorage.removeItem(STORE_KEY)}catch(_){}
+  document.querySelectorAll('#panel-inputs input[type=number],#panel-inputs input[type=text]').forEach(el=>{
+    if(el.id==='weeklyHours')el.value='40';
+    else if(el.id==='weeksPerMonth')el.value='4.35';
+    else if(el.id==='shiftLength')el.value='12';
+    else if(el.id==='unpaidBreak')el.value='0.75';
+    else if(el.id==='otMult')el.value='1.5';
+    else if(el.id==='premPct')el.value='50';
+    else if(el.id==='secondBankHrs')el.value='0';
+    else el.value='';
+  });
+  BOOL_IDS.forEach(id=>{$(id).checked=id==='penExclOt'||id==='penExclSupp'||id==='penExclPrem'});
+  $('otExcess').value='full_next';
+  $('premBase').value='base';
+  $('region').value='ewni';
+  $('penMode').value='ras';
+  $('sl').value='none';
+  period='monthly';
+  syncUi();calc();saveSettings();
+};
+
+function parseTaxCode(raw,annualIncome){
+  const code=String(raw||'').trim().toUpperCase().replace(/\s/g,'');
+  if(!code)return{mode:'unknown',allowance:0,unknown:true};
+  if(code==='BR')return{mode:'flat',rate:RATES.basicRate,unknown:false};
+  if(code==='D0')return{mode:'flat',rate:RATES.higherRate,unknown:false};
+  if(code==='D1')return{mode:'flat',rate:RATES.additionalRate,unknown:false};
+  const k=code.match(/^K(\d+)$/);
+  if(k)return{mode:'standard',allowance:-parseInt(k[1],10)*10,unknown:false};
+  const l=code.match(/^(\d+)L$/);
+  if(l){
+    let allowance=parseInt(l[1],10)*10;
+    if(annualIncome>RATES.taperFrom)allowance=Math.max(0,allowance-(annualIncome-RATES.taperFrom)/2);
+    return{mode:'standard',allowance,unknown:false};
+  }
+  return{mode:'unknown',allowance:0,unknown:true};
+}
+
+function calcAnnualIncomeTaxEw(annualPay,codeInfo){
+  if(codeInfo.mode==='flat')return Math.max(0,annualPay)*codeInfo.rate;
+  const pa=codeInfo.mode==='standard'?codeInfo.allowance:0;
+  const taxable=annualPay-pa;
+  if(taxable<=0)return 0;
+  const basicWidth=RATES.basicRateCeiling-RATES.personalAllowance;
+  const higherCap=RATES.additionalRateFrom-pa;
+  return Math.min(taxable,basicWidth)*RATES.basicRate
+    +Math.max(0,Math.min(taxable,higherCap)-basicWidth)*RATES.higherRate
+    +Math.max(0,taxable-higherCap)*RATES.additionalRate;
+}
+
+function calcAnnualIncomeTaxScot(annualPay,codeInfo){
+  if(codeInfo.mode==='flat')return Math.max(0,annualPay)*codeInfo.rate;
+  const pa=codeInfo.mode==='standard'?codeInfo.allowance:0;
+  const taxable=annualPay-pa;
+  if(taxable<=0)return 0;
+  let tax=0,prev=0;
+  for(const band of RATES.scotlandBands){
+    const slice=Math.max(0,Math.min(taxable,band.up)-prev);
+    tax+=slice*band.rate;
+    prev=band.up;
+    if(taxable<=band.up)break;
+  }
+  return tax;
+}
+
+function calcAnnualIncomeTax(annualPay,codeInfo,region){
+  return region==='scot'?calcAnnualIncomeTaxScot(annualPay,codeInfo):calcAnnualIncomeTaxEw(annualPay,codeInfo);
+}
+
+function calcPeriodNI(periodPay){
+  const b=RATES.ni[period];
+  if(!b||periodPay<=0)return 0;
+  if(periodPay<=b.pt)return 0;
+  const mainBand=Math.max(0,Math.min(periodPay,b.uel)-b.pt);
+  const upperBand=Math.max(0,periodPay-b.uel);
+  return mainBand*b.main+upperBand*b.upper;
+}
+
+function calcAnnualStudentLoan(annualPay,planKey){
+  const plan=RATES.studentLoan[planKey];
+  if(!plan||annualPay<=plan.threshold)return 0;
+  return(annualPay-plan.threshold)*plan.rate;
+}
+
+function paidPerShift(){return Math.max(0,num('shiftLength')-num('unpaidBreak'))}
+
+function calcOtBlock(otHours,base,sup,mult,bankCap,excessMode){
+  const blended=base+sup;
+  const m=Math.max(1,mult);
+  const premiumRate=blended*(m-1);
+  const fullRate=blended*m;
+  const cap=Math.max(0,bankCap);
+  const ot=Math.max(0,otHours);
+  const banked=Math.min(ot,cap);
+  const excess=Math.max(0,ot-cap);
+  let otPay=banked*premiumRate;
+  let secondBank=num('secondBankHrs');
+  let excessPay=0;
+  let payoutNote='';
+  if(excess>0){
+    if(excessMode==='full_next'){
+      excessPay=excess*fullRate;
+      payoutNote='excess paid at ×'+m;
+    }else if(excessMode==='hold_second'){
+      secondBank+=excess;
+      payoutNote=excess.toFixed(2)+' h held in second account';
+    }else{
+      const thresh=num('secondThreshold');
+      const before=secondBank;
+      secondBank+=excess;
+      if(thresh>0&&before<thresh&&secondBank>=thresh){
+        excessPay=secondBank*fullRate;
+        payoutNote='second account paid at threshold';
+        secondBank=0;
+      }else payoutNote=secondBank.toFixed(2)+' h in second account';
+    }
+  }
+  otPay+=excessPay;
+  const premiumPart=banked*premiumRate+(excessMode==='full_next'?excessPay:excessMode==='threshold'&&excessPay?excessPay:0);
+  return{otPay,banked,bankedHours:banked,excessHours:excess,premiumPart,blended,fullRate,secondBank,payoutNote,baseOtHours:ot};
+}
+
+function calcPremiumPay(premHours,base,sup){
+  const hr=$('premBase').value==='blended'?base+sup:base;
+  return Math.max(0,premHours)*hr*(num('premPct')/100);
+}
+
+function buildMonth(shifts,otHours,premHours,overlapH){
+  const base=num('baseRate');
+  const sup=num('supplementRate');
+  const paidH=paidPerShift();
+  const monthlyBasic=base*num('weeklyHours')*num('weeksPerMonth');
+  const supplementPay=sup*shifts*paidH;
+  const allowBase=monthlyBasic+(chk('allowanceIncSupp')?supplementPay:0);
+  const shiftAllow=allowBase*(num('shiftAllowPct')/100);
+  const overlap=Math.min(Math.max(0,overlapH),Math.max(0,otHours),Math.max(0,premHours));
+  const otEligible=Math.max(0,otHours-overlap);
+  const ot=calcOtBlock(otEligible,base,sup,num('otMult')||1.5,num('otBankCap'),$('otExcess').value);
+  const premPay=calcPremiumPay(premHours,base,sup);
+  return{monthlyBasic,supplementPay,shiftAllow,premPay,overlap,otEligible,...ot};
+}
+
+function pensionableFrom(m){
+  const bonus=num('bonus');
+  let p=m.monthlyBasic+m.shiftAllow+bonus;
+  if(!chk('penExclSupp'))p+=m.supplementPay;
+  if(!chk('penExclPrem'))p+=m.premPay;
+  const baseOt=m.otEligible*m.blended;
+  if(chk('penExclOt'))p+=baseOt;
+  else p+=baseOt+m.premiumPart;
+  return Math.max(0,p);
+}
+
+function toPeriod(monthly){return monthly*(12/RATES.periodsPerYear[period])}
+
+function calc(){
+  $('code-warn').classList.toggle('show',parseTaxCode($('code').value,0).unknown);
+  if(!period){
+    $('net').textContent='—';
+    $('netl').textContent='Choose Weekly, Monthly or Annual';
+    $('tbl').innerHTML='';
+    return;
+  }
+  const freq=RATES.periodsPerYear[period];
+  const region=$('region').value;
+  const arrears=chk('arrears');
+  const cur=buildMonth(num('shifts'),num('otHours'),num('premHours'),num('overlapHrs'));
+  const varM=arrears
+    ?buildMonth(num('prevShifts'),num('prevOtHours'),num('prevPremHours'),num('prevOverlap'))
+    :cur;
+  const basicM=cur.monthlyBasic;
+  const bonus=num('bonus');
+  const grossMonth=basicM+varM.supplementPay+varM.shiftAllow+varM.otPay+varM.premPay+bonus;
+  const gross=toPeriod(grossMonth);
+
+  const pensionableMonth=pensionableFrom(arrears?{...varM,monthlyBasic:basicM}:cur);
+  const penPct=num('pension');
+  const penMode=$('penMode').value;
+  const penMonth=pensionableMonth*(penPct/100);
+  const penPeriod=toPeriod(penMonth);
+  const penErMonth=pensionableMonth*(num('pensionEr')/100);
+
+  let taxable=gross;
+  if(penMode==='sacrifice'||penMode==='netpay')taxable=Math.max(0,gross-penPeriod);
+  const annualTaxable=taxable*freq;
+
+  const codeResolved=parseTaxCode($('code').value,annualTaxable);
+  $('code-warn').classList.toggle('show',codeResolved.unknown);
+  const taxAnnual=calcAnnualIncomeTax(annualTaxable,codeResolved,region);
+  const T=taxAnnual/freq;
+  const N=calcPeriodNI(taxable);
+  const slKey=$('sl').value||'none';
+  const slAnnual=slKey==='none'?0:calcAnnualStudentLoan(annualTaxable,slKey);
+  const S=slAnnual/freq;
+
+  const penDeduct=penMode==='ras'?penPeriod:penMode==='netpay'?0:0;
+  const penSac=penMode==='sacrifice'?0:penMode==='netpay'?penPeriod:0;
+  const net=Math.max(0,taxable-T-N-S-penDeduct);
+
+  $('net').textContent=gbp(net);
+  $('netl').textContent='Take-home per '+RATES.periodLabel[period];
+
+  const r=(l,v,c='')=>`<tr class="${c}"><td>${l}</td><td>${v}</td></tr>`;
+  const tag=arrears?' <span style="font-weight:500;color:var(--muted)">(arrears)</span>':'';
+  const rows=[
+    r('Basic (contracted)'+tag,gbp(toPeriod(basicM))),
+    varM.supplementPay?r('Supplement'+tag,gbp(toPeriod(varM.supplementPay))):'',
+    varM.shiftAllow?r('Shift allowance'+tag,gbp(toPeriod(varM.shiftAllow))):'',
+    varM.premPay?r('Premium hours'+tag,gbp(toPeriod(varM.premPay))):'',
+    varM.otPay?r('Overtime pay'+tag,gbp(toPeriod(varM.otPay))):'',
+    bonus?r('Bonus',gbp(toPeriod(bonus))):'',
+    r('Gross pay',gbp(gross)),
+    penMode==='sacrifice'?r('Pension (salary sacrifice)',neg(penPeriod),'neg'):'',
+    penMode==='sacrifice'?'':r('Pay for tax &amp; NI',gbp(taxable)),
+    r('Income tax',neg(T),'neg'),
+    r('National Insurance',neg(N),'neg'),
+    r('Student loan',neg(S),'neg'),
+    penMode==='ras'?r('Pension (relief at source)',neg(penPeriod),'neg'):'',
+    penMode==='netpay'?r('Pension (net pay)',neg(penPeriod),'neg'):'',
+    r('Take-home pay',gbp(net),'tot'),
+    penPct?r('Pensionable pay',gbp(toPeriod(pensionableMonth))):'',
+    num('pensionEr')?r('Employer pension (info)',gbp(toPeriod(penErMonth))):'',
+    penMode==='ras'&&penPct?r('Gross pension (RAS +20%)',gbp(toPeriod(penMonth/0.8))):'',
+    r('Personal allowance (annual)',codeResolved.mode==='standard'?gbp(codeResolved.allowance):(codeResolved.unknown?'Unknown code':'N/A')),
+    r('Annual take-home',gbp(net*freq))
+  ];
+  const bank=[];
+  if(varM.bankedHours)bank.push(r('Time bank (this month)',varM.bankedHours.toFixed(2)+' h'));
+  if(varM.excessHours&&$('otExcess').value!=='full_next')bank.push(r('Second account',varM.secondBank.toFixed(2)+' h'));
+  if(varM.payoutNote&&$('otExcess').value!=='full_next')bank.push(r('OT above cap',varM.payoutNote));
+  $('tbl').innerHTML=rows.join('')+bank.join('');
+}
+
+function onFieldInput(){calc();saveSettings()}
+document.querySelectorAll('input,select').forEach(e=>{
+  e.addEventListener('input',onFieldInput);
+  e.addEventListener('change',onFieldInput);
+});
+loadSettings();syncUi();calc();
+const THEME_KEY='take-home-theme';
+const THEME_CYCLE=['system','light','dark'];
+const THEME_LABEL={system:'Auto',light:'Light',dark:'Dark'};
+const THEME_COLOR={system:null,light:'#f6f3ec',dark:'#32363e'};
+const themeBtn=$('theme'),metaTheme=$('meta-theme');
+function resolvedTheme(){
+  const m=localStorage.getItem(THEME_KEY)||'system';
+  if(m==='light'||m==='dark')return m;
+  return matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';
+}
+function applyTheme(mode){
+  const m=THEME_CYCLE.includes(mode)?mode:'system';
+  try{localStorage.setItem(THEME_KEY,m)}catch(_){}
+  document.documentElement.setAttribute('data-theme',m);
+  if(themeBtn){
+    themeBtn.textContent=THEME_LABEL[m];
+    themeBtn.setAttribute('aria-label','Theme: '+THEME_LABEL[m]);
+  }
+  if(metaTheme){
+    const r=m==='system'?resolvedTheme():m;
+    metaTheme.setAttribute('content',THEME_COLOR[r]||'#32363e');
+  }
+}
+if(themeBtn){
+  applyTheme(localStorage.getItem(THEME_KEY)||'system');
+  themeBtn.onclick=()=>{
+    const cur=localStorage.getItem(THEME_KEY)||'system';
+    const i=THEME_CYCLE.indexOf(cur);
+    applyTheme(THEME_CYCLE[(i+1)%THEME_CYCLE.length]);
+  };
+}
+matchMedia('(prefers-color-scheme: light)').addEventListener('change',()=>{
+  if((localStorage.getItem(THEME_KEY)||'system')==='system')applyTheme('system');
+});
+let installEvt=null;const installBtn=$('install'),installTip=$('install-tip');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;installBtn.hidden=false});
+installBtn.onclick=async()=>{if(installEvt){installEvt.prompt();installEvt=null;installBtn.hidden=true}else installTip.hidden=false};
+function showIosInstallTip(){const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ const standalone=matchMedia('(display-mode:standalone)').matches||navigator.standalone;
+ if(ios&&!standalone){installBtn.hidden=false;installBtn.textContent='Save to Home Screen';
+  installTip.textContent='Tap Share, then “Add to Home Screen”. Your inputs are saved on this device for next time.';
+  installBtn.onclick=()=>{installTip.hidden=false}}}
+showIosInstallTip();
+if('serviceWorker' in navigator){
+  let reloadOnCtrl=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloadOnCtrl){reloadOnCtrl=false;location.reload()}});
+  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>{
+    reg.update();
+    reg.addEventListener('updatefound',()=>{
+      const w=reg.installing;
+      if(!w)return;
+      w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)reloadOnCtrl=true});
+    });
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update()});
+  }).catch(()=>{});
+}
+</script>
+</body>
+</html>
