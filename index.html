@@ -511,34 +511,8 @@ tr.tot td{font-weight:730;border-top:1px solid var(--tot-line);border-bottom:0;p
 </div>
 <p class="note">Estimate only. Uses the tax year shown above. Pension and extra sacrifice reduce taxable pay and NI. Income tax is worked out annually then split across periods; NI uses period thresholds. Not for Scottish tax, benefits in kind, or exact payroll timing. Your payslip may differ.</p>
 </div>
-<script>
-/* ─── Tax year constants — update each April ─── */
-const TAX_YEAR='2026/27';
-const RATES={
-  personalAllowance:12570,
-  taperFrom:100000,
-  basicRateCeiling:50270,
-  additionalRateFrom:125140,
-  basicRate:0.20,
-  higherRate:0.40,
-  additionalRate:0.45,
-  periodsPerYear:{weekly:52,monthly:12,annual:1},
-  periodLabel:{weekly:'week',monthly:'month',annual:'year'},
-  ni:{
-    weekly:{pt:242,uel:967,main:0.08,upper:0.02},
-    monthly:{pt:1048,uel:4189,main:0.08,upper:0.02},
-    annual:{pt:12570,uel:50270,main:0.08,upper:0.02}
-  },
-  studentLoan:{
-    none:null,
-    p1:{threshold:26900,rate:0.09},
-    p2:{threshold:29385,rate:0.09},
-    p4:{threshold:33795,rate:0.09},
-    p5:{threshold:25000,rate:0.09},
-    pg:{threshold:21000,rate:0.06}
-  }
-};
-/* ─── end tax year block ─── */
+<script type="module">
+import {TAX_YEAR,RATES,parseTaxCode,computeTakeHome} from './calc.mjs';
 
 const STORE_KEY='take-home-settings-v2';
 const FIELD_IDS=['rate','otrate','hours','othours','shiftAllow','supplement','pension','bonus','sac','code','sl'];
@@ -597,58 +571,6 @@ bindModeSeg('bonusMode',m=>{bonusMode=m});
 bindModeSeg('shiftAllowMode',m=>{shiftAllowMode=m});
 bindModeSeg('supplementMode',m=>{supplementMode=m});
 
-function optionalExtra(inputId,mode,pctBase,hourlyHours){
-  const v=num(inputId);
-  if(v<=0)return 0;
-  if(mode==='pct')return pctBase*(v/100);
-  if(mode==='hourly')return v*hourlyHours;
-  return v;
-}
-
-function parseTaxCode(raw,annualIncome){
-  const code=String(raw||'').trim().toUpperCase().replace(/\s/g,'');
-  if(!code)return{mode:'unknown',allowance:0,unknown:true};
-  if(code==='BR')return{mode:'flat',rate:RATES.basicRate,unknown:false};
-  if(code==='D0')return{mode:'flat',rate:RATES.higherRate,unknown:false};
-  if(code==='D1')return{mode:'flat',rate:RATES.additionalRate,unknown:false};
-  const k=code.match(/^K(\d+)$/);
-  if(k)return{mode:'standard',allowance:-parseInt(k[1],10)*10,unknown:false};
-  const l=code.match(/^(\d+)L$/);
-  if(l){
-    let allowance=parseInt(l[1],10)*10;
-    if(annualIncome>RATES.taperFrom)allowance=Math.max(0,allowance-(annualIncome-RATES.taperFrom)/2);
-    return{mode:'standard',allowance,unknown:false};
-  }
-  return{mode:'unknown',allowance:0,unknown:true};
-}
-
-function calcAnnualIncomeTax(annualPay,codeInfo){
-  if(codeInfo.mode==='flat')return Math.max(0,annualPay)*codeInfo.rate;
-  const pa=codeInfo.mode==='standard'?codeInfo.allowance:0;
-  const taxable=annualPay-pa;
-  if(taxable<=0)return 0;
-  const basicWidth=RATES.basicRateCeiling-RATES.personalAllowance;
-  const higherCap=RATES.additionalRateFrom-pa;
-  return Math.min(taxable,basicWidth)*RATES.basicRate
-    +Math.max(0,Math.min(taxable,higherCap)-basicWidth)*RATES.higherRate
-    +Math.max(0,taxable-higherCap)*RATES.additionalRate;
-}
-
-function calcPeriodNI(periodPay){
-  const b=RATES.ni[period];
-  if(!b||periodPay<=0)return 0;
-  if(periodPay<=b.pt)return 0;
-  const mainBand=Math.max(0,Math.min(periodPay,b.uel)-b.pt);
-  const upperBand=Math.max(0,periodPay-b.uel);
-  return mainBand*b.main+upperBand*b.upper;
-}
-
-function calcAnnualStudentLoan(annualPay,planKey){
-  const plan=RATES.studentLoan[planKey];
-  if(!plan||annualPay<=plan.threshold)return 0;
-  return(annualPay-plan.threshold)*plan.rate;
-}
-
 function calc(){
   const codeInfo=parseTaxCode($('code').value,0);
   $('code-warn').classList.toggle('show',codeInfo.unknown);
@@ -660,58 +582,48 @@ function calc(){
     return;
   }
 
-  const freq=RATES.periodsPerYear[period];
-  const basicPay=num('hours')*num('rate');
-  const otPay=num('othours')*num('otrate');
-  const totalHours=num('hours')+num('othours');
-  const shiftAllow=optionalExtra('shiftAllow',shiftAllowMode,basicPay,0);
-  const supplement=optionalExtra('supplement',supplementMode,0,totalHours);
-  const payBeforeBonus=basicPay+otPay+shiftAllow+supplement;
-  const bonusIn=num('bonus');
-  const bonus=bonusIn>0?(bonusMode==='pct'?payBeforeBonus*(bonusIn/100):bonusIn):0;
-  const gross=payBeforeBonus+bonus;
-  const penPct=num('pension');
-  const pen=gross*(penPct/100);
-  const extra=num('sac');
-  const sac=pen+extra;
-  const pay=Math.max(0,gross-sac);
-  const annualPay=pay*freq;
+  const out=computeTakeHome({
+    period,
+    rate:num('rate'),
+    otrate:num('otrate'),
+    hours:num('hours'),
+    othours:num('othours'),
+    shiftAllowAmt:num('shiftAllow'),
+    shiftAllowMode,
+    supplementAmt:num('supplement'),
+    supplementMode,
+    bonusAmt:num('bonus'),
+    bonusMode,
+    pensionPct:num('pension'),
+    extraSacrifice:num('sac'),
+    taxCode:$('code').value,
+    studentLoan:$('sl').value,
+  });
+  if(!out)return;
 
-  const codeResolved=parseTaxCode($('code').value,annualPay);
-  $('code-warn').classList.toggle('show',codeResolved.unknown);
+  $('code-warn').classList.toggle('show',out.codeInfo.unknown);
 
-  const taxAnnual=calcAnnualIncomeTax(annualPay,codeResolved);
-  const T=taxAnnual/freq;
-  const N=calcPeriodNI(pay);
-
-  const slKey=$('sl').value;
-  const planKey=slKey===''?'none':slKey;
-  const slAnnual=planKey==='none'?0:calcAnnualStudentLoan(annualPay,planKey);
-  const S=slAnnual/freq;
-
-  const net=Math.max(0,pay-T-N-S);
-
-  $('net').textContent=gbp(net);
+  $('net').textContent=gbp(out.net);
   $('netl').textContent='Take-home per '+RATES.periodLabel[period];
 
-  const paShown=codeResolved.mode==='standard'?codeResolved.allowance:(codeResolved.mode==='flat'?0:0);
+  const paShown=out.codeInfo.mode==='standard'?out.codeInfo.allowance:0;
   const r=(l,v,c='')=>`<tr class="${c}"><td>${l}</td><td>${v}</td></tr>`;
-  const bonusRow=bonus>0?r('Bonus',gbp(bonus)): '';
+  const bonusRow=out.bonus>0?r('Bonus',gbp(out.bonus)): '';
   $('tbl').innerHTML=
-    (shiftAllow>0?r('Shift allowance',gbp(shiftAllow)):'')+
-    (supplement>0?r('Supplement',gbp(supplement)):'')+
-    (bonus>0?r('Pay before bonus',gbp(payBeforeBonus)): '')+
+    (out.shiftAllow>0?r('Shift allowance',gbp(out.shiftAllow)):'')+
+    (out.supplement>0?r('Supplement',gbp(out.supplement)):'')+
+    (out.bonus>0?r('Pay before bonus',gbp(out.payBeforeBonus)): '')+
     bonusRow+
-    r('Gross pay',gbp(gross))+
-    r('Pension (salary sacrifice)',neg(pen),'neg')+
-    r('Extra salary sacrifice',neg(extra),'neg')+
-    r('Pay after sacrifice',gbp(pay))+
-    r('Income tax',neg(T),'neg')+
-    r('National Insurance',neg(N),'neg')+
-    r('Student loan',neg(S),'neg')+
-    r('Take-home pay',gbp(net),'tot')+
-    r('Personal allowance (annual)',codeResolved.mode==='standard'?gbp(paShown):(codeResolved.unknown?'Not applied (unknown code)':'Not applied'))+
-    r('Annual take-home',gbp(net*freq));
+    r('Gross pay',gbp(out.gross))+
+    r('Pension (salary sacrifice)',neg(out.pension),'neg')+
+    r('Extra salary sacrifice',neg(out.extraSacrifice),'neg')+
+    r('Pay after sacrifice',gbp(out.payAfterSacrifice))+
+    r('Income tax',neg(out.periodTax),'neg')+
+    r('National Insurance',neg(out.periodNi),'neg')+
+    r('Student loan',neg(out.periodSl),'neg')+
+    r('Take-home pay',gbp(out.net),'tot')+
+    r('Personal allowance (annual)',out.codeInfo.mode==='standard'?gbp(paShown):(out.codeInfo.unknown?'Not applied (unknown code)':'Not applied'))+
+    r('Annual take-home',gbp(out.annualNet));
 }
 
 function onFieldInput(){calc();saveSettings()}
