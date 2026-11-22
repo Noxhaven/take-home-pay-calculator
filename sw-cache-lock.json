@@ -1,0 +1,10 @@
+{
+  "cache": "take-home-v11",
+  "assetHashes": {
+    "index.html": "0b32b55d45e264f5ecd7b23a5042449bed9ffc0e22f43c10ef6594697c392443",
+    "calc.mjs": "a945b80364333c92e2341e100dd176301af5003aba38b5abe69a8ccf28ef5a79",
+    "manifest.webmanifest": "c222fa8ea632ae560e6b8fb5e1929313d318518b427507298c333036a5c974eb",
+    "icons/icon.svg": "b2d66d487a3dd15690af32d81e5894e157b7f603222c44a4bf2b2b7c827978ae",
+    "icons/icon-maskable.svg": "62a6b1320fd5fef128094bba6888d74eea20c68467e73f04101c861689791ae5"
+  }
+}
